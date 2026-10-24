@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#241a34"/>
+      <stop offset="0.45" stop-color="#4a3a63"/>
+      <stop offset="0.7"  stop-color="#6a5480"/>
+      <stop offset="1"    stop-color="#2c2240"/>
+    </linearGradient>
+    <linearGradient id="upperWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c2a687"/>
+      <stop offset="1" stop-color="#a3855f"/>
+    </linearGradient>
+    <linearGradient id="lowerWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b7488"/>
+      <stop offset="1" stop-color="#525a70"/>
+    </linearGradient>
+    <clipPath id="tile"><rect x="4" y="4" width="248" height="248" rx="36"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#tile)">
+    <rect x="4" y="4" width="248" height="248" fill="url(#sky)"/>
+
+    <!-- distant stars -->
+    <circle cx="34" cy="34" r="2.4" fill="#f3e6c8" opacity="0.85"/>
+    <circle cx="70" cy="20" r="2" fill="#f3e6c8" opacity="0.7"/>
+    <circle cx="150" cy="30" r="2.2" fill="#f3e6c8" opacity="0.8"/>
+    <circle cx="222" cy="46" r="1.8" fill="#f3e6c8" opacity="0.6"/>
+    <circle cx="24" cy="70" r="1.6" fill="#f3e6c8" opacity="0.55"/>
+
+    <!-- ground -->
+    <rect x="0" y="228" width="256" height="28" fill="#152416"/>
+    <rect x="0" y="228" width="256" height="8" fill="#213a24"/>
+
+    <!-- smoke, drifting straight up -->
+    <g fill="#a7add0" opacity="0.6">
+      <rect x="174" y="26" width="9" height="9" rx="2"/>
+      <rect x="177" y="42" width="10" height="10" rx="2" opacity="0.5"/>
+      <rect x="173" y="60" width="12" height="11" rx="2" opacity="0.4"/>
+    </g>
+
+    <!-- chimney, rising out of the roof's right slope - warm brick tone,
+         kept clearly distinct from the cool grey smoke above it. Sized to
+         sit fully within one flat roof step (168-190) so its base lines
+         up flush with that step instead of crossing into the next one. -->
+    <rect x="170" y="68" width="18" height="40" fill="#8a4a3a" stroke="#3a1c18" stroke-width="4"/>
+    <rect x="170" y="68" width="18" height="8" fill="#a3604a"/>
+
+    <!-- roof: pitched gable, built from pixel-art steps (like the tavern
+         exterior in the main menu background) instead of a flat crenellation -->
+    <path d="M 44 122
+             L 66 122 L 66 108
+             L 88 108 L 88 96
+             L 106 96 L 106 84
+             L 120 84 L 120 72
+             L 136 72 L 136 84
+             L 150 84 L 150 96
+             L 168 96 L 168 108
+             L 190 108 L 190 122
+             L 212 122 L 212 132 L 44 132 Z"
+          fill="#5a2f28" stroke="#3a1c18" stroke-width="4" stroke-linejoin="round"/>
+
+    <!-- upper story -->
+    <rect x="52" y="132" width="152" height="54" fill="url(#upperWall)" stroke="#3a2418" stroke-width="5"/>
+    <rect x="52" y="132" width="10" height="54" fill="#3a2418"/>
+    <rect x="194" y="132" width="10" height="54" fill="#3a2418"/>
+    <rect x="123" y="132" width="10" height="54" fill="#3a2418"/>
+
+    <!-- windows (warm arched glow) -->
+    <g>
+      <path d="M 76 176 L 76 152 C 76 140 100 140 100 152 L 100 176 Z" fill="#f2b93c" stroke="#3a2418" stroke-width="4"/>
+      <line x1="88" y1="146" x2="88" y2="176" stroke="#3a2418" stroke-width="3"/>
+      <line x1="77" y1="162" x2="99" y2="162" stroke="#3a2418" stroke-width="3"/>
+    </g>
+    <g>
+      <path d="M 156 176 L 156 152 C 156 140 180 140 180 152 L 180 176 Z" fill="#f2b93c" stroke="#3a2418" stroke-width="4"/>
+      <line x1="168" y1="146" x2="168" y2="176" stroke="#3a2418" stroke-width="3"/>
+      <line x1="157" y1="162" x2="179" y2="162" stroke="#3a2418" stroke-width="3"/>
+    </g>
+
+    <!-- lower story: stone -->
+    <rect x="40" y="186" width="176" height="46" fill="url(#lowerWall)" stroke="#3a2418" stroke-width="5"/>
+    <g fill="none" stroke="#454c60" stroke-width="2.5" opacity="0.8">
+      <path d="M 40 200 L 76 200"/>
+      <path d="M 92 200 L 132 200"/>
+      <path d="M 148 200 L 184 200"/>
+      <path d="M 200 200 L 216 200"/>
+      <path d="M 40 216 L 60 216"/>
+      <path d="M 76 216 L 116 216"/>
+      <path d="M 132 216 L 172 216"/>
+      <path d="M 188 216 L 216 216"/>
+    </g>
+
+    <!-- door -->
+    <rect x="112" y="200" width="32" height="32" fill="#3a2418" stroke="#241207" stroke-width="4"/>
+    <line x1="128" y1="200" x2="128" y2="232" stroke="#241207" stroke-width="3"/>
+
+    <!-- torch/lantern, left of the door -->
+    <rect x="94" y="212" width="4" height="10" fill="#3a2418"/>
+    <circle cx="96" cy="209" r="5.5" fill="#f6c94a"/>
+    <circle cx="96" cy="209" r="9" fill="#f6c94a" opacity="0.35"/>
+
+    <!-- hanging sign, right of the door -->
+    <line x1="160" y1="196" x2="176" y2="196" stroke="#3a2418" stroke-width="4"/>
+    <line x1="176" y1="196" x2="176" y2="202" stroke="#3a2418" stroke-width="3"/>
+    <rect x="160" y="202" width="24" height="16" rx="2" fill="#5a3a22" stroke="#241207" stroke-width="3"/>
+    <path d="M 168 214 L 168 208 C 168 205 176 205 176 208 L 176 214 Z" fill="#f2ead6"/>
+  </g>
+
+  <rect x="4" y="4" width="248" height="248" rx="36" fill="none" stroke="#d4af37" stroke-width="8"/>
+</svg>

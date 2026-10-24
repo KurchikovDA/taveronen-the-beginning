@@ -1,0 +1,564 @@
+[gd_scene format=3 uid="uid://0ir0aje114ju"]
+
+[ext_resource type="Texture2D" uid="uid://dwdx1004ax5tm" path="res://assets/menu/menu_background.png" id="1_flqon"]
+[ext_resource type="Shader" uid="uid://f4opw16jqyqu" path="res://scripts/shaders/menu_background_glow.gdshader" id="1_rcqid"]
+[ext_resource type="Theme" uid="uid://b1p02b6oy651c" path="res://assets/game_theme.tres" id="2_rcqid"]
+[ext_resource type="Script" uid="uid://crvkh4r4whv1w" path="res://scripts/ui/new_game_button.gd" id="3_1ajci"]
+[ext_resource type="FontFile" uid="uid://j7h8kjhhwkr" path="res://assets/fonts/TaveronenStart-Regular.ttf" id="4_1ajci"]
+[ext_resource type="Script" uid="uid://ddmo5iookodmh" path="res://scripts/ui/menu_continue_button.gd" id="4_7b55j"]
+[ext_resource type="Script" uid="uid://cx4quyjlqeyxb" path="res://scripts/ui/settings_button.gd" id="5_5pajh"]
+[ext_resource type="Script" uid="uid://b814erhkmqwbx" path="res://scripts/ui/credits_button.gd" id="6_j7ex8"]
+[ext_resource type="Script" uid="uid://ehmjj85b5su0" path="res://scripts/ui/quit_button.gd" id="7_a8gd2"]
+[ext_resource type="AudioStream" uid="uid://hte1xt1hvlad" path="res://assets/audio/button_hover.wav" id="9_8egab"]
+[ext_resource type="AudioStream" uid="uid://dko3ktcu5juyv" path="res://assets/audio/menu_theme_5min.ogg" id="10_1ajci"]
+[ext_resource type="Script" uid="uid://dt5lvnen14ka4" path="res://scripts/ui/translated_rich_text.gd" id="10_gw5y6"]
+[ext_resource type="Script" uid="uid://c0the6ojnwfhp" path="res://scripts/ui/back_button.gd" id="11_svtp6"]
+[ext_resource type="PackedScene" uid="uid://dp1twep228bcd" path="res://scenes/settings_panel.tscn" id="12_1dfpl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_flqon"]
+shader = ExtResource("1_rcqid")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iotk1"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7882353, 0.627451, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cm266"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w44g7"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tgk0f"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7882353, 0.627451, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8u0te"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oiatc"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g8g3n"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.14901961, 0.14901961, 0.14901961, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.61960787, 0.5411765, 0.36862746, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mg3m2"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7882353, 0.627451, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ojb7r"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e5qqf"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7bbuq"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7882353, 0.627451, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_saq78"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8uw0o"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ql5ya"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7882353, 0.627451, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ka3nr"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_48knj"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22745098, 0.21176471, 0.1882353, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2d7k"]
+bg_color = Color(0, 0, 0, 0.7058824)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dy7ct"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.11170886, 0.113138534, 0.23486263, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0o4t1"]
+bg_color = Color(0.16470589, 0.14117648, 0.1254902, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0k4wn"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_size = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j5v2v"]
+bg_color = Color(0.22745098, 0.19607843, 0.15686275, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rcqid"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.22745098, 0.08235294, 0.09411765, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MainMenu" type="Control" unique_id=167957949]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1554285346]
+material = SubResource("ShaderMaterial_flqon")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_flqon")
+
+[node name="TitleLabel" type="Label" parent="." unique_id=1845139941]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 44.0
+offset_right = 973.0
+offset_bottom = 176.0
+theme = ExtResource("2_rcqid")
+theme_override_constants/outline_size = 50
+theme_override_constants/shadow_outline_size = 25
+theme_override_fonts/font = ExtResource("4_1ajci")
+theme_override_font_sizes/font_size = 40
+text = "MENU_TITLE"
+metadata/autofit_max_size = 40
+
+[node name="NewGameButton" type="Button" parent="." unique_id=1336108410]
+layout_mode = 0
+offset_left = 729.0
+offset_top = 121.0
+offset_right = 973.0
+offset_bottom = 200.0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_iotk1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cm266")
+theme_override_styles/hover = SubResource("StyleBoxFlat_w44g7")
+text = "MENU_NEW_GAME"
+clip_text = true
+script = ExtResource("3_1ajci")
+
+[node name="ContinueButton" type="Button" parent="." unique_id=1426077456]
+layout_mode = 0
+offset_left = 729.0
+offset_top = 204.0
+offset_right = 973.0
+offset_bottom = 283.0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_tgk0f")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_8u0te")
+theme_override_styles/hover = SubResource("StyleBoxFlat_oiatc")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_g8g3n")
+text = "MENU_CONTINUE"
+clip_text = true
+script = ExtResource("4_7b55j")
+
+[node name="SettingsButton" type="Button" parent="." unique_id=1856191590]
+layout_mode = 0
+offset_left = 729.0
+offset_top = 287.0
+offset_right = 973.0
+offset_bottom = 366.0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_mg3m2")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ojb7r")
+theme_override_styles/hover = SubResource("StyleBoxFlat_e5qqf")
+text = "MENU_SETTINGS"
+clip_text = true
+script = ExtResource("5_5pajh")
+
+[node name="CreditsButton" type="Button" parent="." unique_id=2060793698]
+layout_mode = 0
+offset_left = 729.0
+offset_top = 371.0
+offset_right = 973.0
+offset_bottom = 450.0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_7bbuq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_saq78")
+theme_override_styles/hover = SubResource("StyleBoxFlat_8uw0o")
+text = "MENU_CREDITS"
+clip_text = true
+script = ExtResource("6_j7ex8")
+
+[node name="QuitButton" type="Button" parent="." unique_id=102080270]
+layout_mode = 0
+offset_left = 729.0
+offset_top = 456.0
+offset_right = 973.0
+offset_bottom = 535.0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_ql5ya")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ka3nr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_48knj")
+text = "MENU_QUIT"
+clip_text = true
+script = ExtResource("7_a8gd2")
+
+[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=1557451155]
+stream = ExtResource("10_1ajci")
+autoplay = true
+bus = &"Music"
+playback_type = 1
+
+[node name="HoverSound" type="AudioStreamPlayer" parent="." unique_id=1962327504]
+unique_name_in_owner = true
+stream = ExtResource("9_8egab")
+volume_db = -20.0
+bus = &"SFX"
+
+[node name="CreditsPanel" type="Panel" parent="." unique_id=352468737]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_i2d7k")
+
+[node name="CreditsCard" type="Panel" parent="CreditsPanel" unique_id=321846948]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -175.0
+offset_right = 325.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dy7ct")
+
+[node name="CreditsText" type="RichTextLabel" parent="CreditsPanel/CreditsCard" unique_id=1120459311]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_rcqid")
+theme_override_constants/line_separation = 8
+theme_override_font_sizes/normal_font_size = 17
+bbcode_enabled = true
+text = "CREDITS_BODY"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("10_gw5y6")
+translation_key = "CREDITS_BODY"
+metadata/_autofit_original_bbcode = "CREDITS_BODY"
+metadata/_autofit_base_normal_size = 17
+metadata/_autofit_last_applied = "CREDITS_BODY"
+metadata/_autofit_last_set_size = 17
+metadata/_autofit_last_available_height = 310.0
+
+[node name="BackButton" type="Button" parent="CreditsPanel/CreditsCard" unique_id=1271262200]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 180.0
+offset_right = 220.0
+offset_bottom = 226.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_0o4t1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0k4wn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j5v2v")
+text = "BTN_BACK"
+clip_text = true
+script = ExtResource("11_svtp6")
+
+[node name="ConfirmNewGamePanel" type="Panel" parent="." unique_id=1714197902]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_i2d7k")
+
+[node name="ConfirmCard" type="Panel" parent="ConfirmNewGamePanel" unique_id=1100444982]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -110.0
+offset_right = 325.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rcqid")
+
+[node name="ConfirmText" type="RichTextLabel" parent="ConfirmNewGamePanel/ConfirmCard" unique_id=1426299608]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_rcqid")
+theme_override_constants/line_separation = 8
+theme_override_font_sizes/normal_font_size = 17
+bbcode_enabled = true
+text = "NEW_GAME_CONFIRM_BODY"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("10_gw5y6")
+translation_key = "NEW_GAME_CONFIRM_BODY"
+metadata/_autofit_original_bbcode = "NEW_GAME_CONFIRM_BODY"
+metadata/_autofit_base_normal_size = 17
+metadata/_autofit_last_applied = "NEW_GAME_CONFIRM_BODY"
+metadata/_autofit_last_set_size = 17
+metadata/_autofit_last_available_height = 180.0
+
+[node name="ConfirmNoButton" type="Button" parent="ConfirmNewGamePanel/ConfirmCard" unique_id=1313632498]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = 115.0
+offset_right = -10.0
+offset_bottom = 161.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_0o4t1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0k4wn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j5v2v")
+text = "BTN_NO"
+clip_text = true
+
+[node name="ConfirmYesButton" type="Button" parent="ConfirmNewGamePanel/ConfirmCard" unique_id=1728774041]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = 115.0
+offset_right = 320.0
+offset_bottom = 161.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_rcqid")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_0o4t1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0k4wn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j5v2v")
+text = "BTN_YES"
+clip_text = true
+
+[node name="SettingsPanel" parent="." unique_id=1446897405 instance=ExtResource("12_1dfpl")]
+unique_name_in_owner = true
+layout_mode = 1

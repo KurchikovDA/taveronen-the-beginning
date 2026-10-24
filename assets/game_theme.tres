@@ -1,0 +1,10 @@
+[gd_resource type="Theme" format=3 uid="uid://b1p02b6oy651c"]
+
+[ext_resource type="FontFile" uid="uid://j7h8kjhhwkr" path="res://assets/fonts/TaveronenStart-Regular.ttf" id="1_tgk0f"]
+
+[sub_resource type="FontVariation" id="FontVariation_iotk1"]
+base_font = ExtResource("1_tgk0f")
+
+[resource]
+default_font = SubResource("FontVariation_iotk1")
+default_font_size = 10

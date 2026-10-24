@@ -1,0 +1,746 @@
+[gd_scene format=3 uid="uid://by3p4plngtsps"]
+
+[ext_resource type="Script" uid="uid://cjoc68bh6snum" path="res://scripts/gameplay/tavern_interactions.gd" id="1_txucg"]
+[ext_resource type="Theme" uid="uid://b1p02b6oy651c" path="res://assets/game_theme.tres" id="2_nlcnu"]
+[ext_resource type="Script" uid="uid://c5elrdv5j8187" path="res://scripts/ui/label.gd" id="3_5srvo"]
+[ext_resource type="Script" uid="uid://cvaorktvn5be7" path="res://scripts/gameplay/taveronen_sign.gd" id="4_jn8xw"]
+[ext_resource type="Script" uid="uid://cbiroiwm3r4o1" path="res://scripts/gameplay/shop_panel.gd" id="4_sro7e"]
+[ext_resource type="Script" uid="uid://dt5lvnen14ka4" path="res://scripts/ui/translated_rich_text.gd" id="5_jn8xw"]
+[ext_resource type="AudioStream" uid="uid://bcgycd6gticvt" path="res://assets/audio/letter_appear.wav" id="5_xmvvs"]
+[ext_resource type="Script" uid="uid://diwj57vr67ev3" path="res://scripts/ui/continue_playing_button.gd" id="6_xmvvs"]
+[ext_resource type="Script" uid="uid://srmasf1ns4tm" path="res://scripts/ui/return_to_menu_button.gd" id="7_0oyxf"]
+[ext_resource type="Script" uid="uid://sq4h2wjfp5oy" path="res://scripts/ui/victory_card_buttons_fit.gd" id="7_xmvvs"]
+[ext_resource type="Script" uid="uid://ee5gjebf7ntm" path="res://scripts/ui/escape_menu.gd" id="8_0k6b0"]
+[ext_resource type="PackedScene" uid="uid://dp1twep228bcd" path="res://scenes/settings_panel.tscn" id="9_0qudn"]
+[ext_resource type="Texture2D" uid="uid://dlq12id4g763y" path="res://assets/furniture/tavern_background.png" id="10_v6o46"]
+[ext_resource type="Texture2D" uid="uid://cswim2kei0ov1" path="res://assets/furniture/fireplace_spritesheet.png" id="11_sdyde"]
+[ext_resource type="Texture2D" uid="uid://cro47034jjchj" path="res://assets/furniture/chair.png" id="12_8ndtt"]
+[ext_resource type="Texture2D" uid="uid://drsas15fwufso" path="res://assets/furniture/table.png" id="13_hpm58"]
+[ext_resource type="Texture2D" uid="uid://dhq6u1tbxkrmo" path="res://assets/furniture/barrel.png" id="14_1nelu"]
+[ext_resource type="Texture2D" uid="uid://bw7jvdlw0p45p" path="res://assets/furniture/bar_counter.png" id="15_gnpbg"]
+[ext_resource type="Texture2D" uid="uid://cjep12ptqxg2w" path="res://assets/furniture/torch_spritesheet.png" id="16_4okkg"]
+[ext_resource type="Texture2D" uid="uid://di4sanbq3pwvm" path="res://assets/furniture/dragon_trophy_blink_spritesheet.png" id="17_7y83r"]
+[ext_resource type="Script" uid="uid://beoj2jppm8yki" path="res://scripts/gameplay/dragon_trophy_sprite.gd" id="18_q3x83"]
+[ext_resource type="AudioStream" uid="uid://dgadt7oocd6pj" path="res://assets/audio/item_appear.wav" id="19_s2vse"]
+[ext_resource type="AudioStream" uid="uid://b1f166ssapn53" path="res://assets/audio/coin_pickup.wav" id="20_4ngsn"]
+[ext_resource type="Script" uid="uid://xlcwi6cm27eb" path="res://scripts/gameplay/day_night_cycle.gd" id="21_nlcnu"]
+[ext_resource type="Script" uid="uid://b13jt3mefespa" path="res://scripts/gameplay/dust_motes.gd" id="22_5srvo"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8vh3i"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.16470589, 0.15686275, 0.14901961, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.5411765, 0.5176471, 0.47058824, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2fxss"]
+bg_color = Color(0, 0, 0, 0.7058824)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gsahv"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.050980393, 0.15294118, 0.12941177, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lsg41"]
+bg_color = Color(0.16470589, 0.14117648, 0.1254902, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ycl0h"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_size = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nu4mv"]
+bg_color = Color(0.22745098, 0.19607843, 0.15686275, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i8861"]
+bg_color = Color(0, 0, 0, 0.7058824)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2d7k"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.44705883, 0.3647059, 0.09019608, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4rvb"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.050980393, 0.15294118, 0.12941177, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2x3md"]
+atlas = ExtResource("11_sdyde")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6pmnl"]
+atlas = ExtResource("11_sdyde")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_77jyt"]
+atlas = ExtResource("11_sdyde")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tet0i"]
+atlas = ExtResource("11_sdyde")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_i2d7k"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2x3md")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6pmnl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_77jyt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tet0i")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o3u2n"]
+atlas = ExtResource("16_4okkg")
+region = Rect2(0, 0, 80, 140)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2fxss"]
+atlas = ExtResource("16_4okkg")
+region = Rect2(80, 0, 80, 140)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g80bu"]
+atlas = ExtResource("16_4okkg")
+region = Rect2(160, 0, 80, 140)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lsg41"]
+atlas = ExtResource("16_4okkg")
+region = Rect2(240, 0, 80, 140)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tsgqx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o3u2n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2fxss")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g80bu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lsg41")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ycl0h"]
+atlas = ExtResource("17_7y83r")
+region = Rect2(0, 0, 140, 180)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nu4mv"]
+atlas = ExtResource("17_7y83r")
+region = Rect2(140, 0, 140, 180)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7t0j6"]
+atlas = ExtResource("17_7y83r")
+region = Rect2(280, 0, 140, 180)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_624bs"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ycl0h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nu4mv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7t0j6")
+}],
+"loop": 0,
+"name": &"blink",
+"speed": 8.0
+}]
+
+[node name="Tavern" type="Node2D" unique_id=1035662066]
+script = ExtResource("1_txucg")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1768727434]
+
+[node name="GoldLabel" type="RichTextLabel" parent="CanvasLayer" unique_id=658680780]
+offset_left = 10.0
+offset_top = 25.0
+offset_right = 490.0
+offset_bottom = 106.0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/normal_font_size = 25
+bbcode_enabled = true
+text = "Gold: 0"
+script = ExtResource("3_5srvo")
+metadata/_autofit_original_bbcode = "Gold: 0"
+metadata/_autofit_base_normal_size = 25
+metadata/_autofit_last_applied = "Gold: 0"
+metadata/_autofit_last_set_size = 25
+metadata/_autofit_last_available_height = 81.0
+
+[node name="TaveronenSign" type="Control" parent="CanvasLayer" unique_id=1480094918 groups=["autofit_exclude"]]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -248.0
+offset_top = -295.0
+offset_right = -117.0
+offset_bottom = 38.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_jn8xw")
+metadata/_autofit_original_bbcode = "T
+a
+v
+e
+r
+o
+n
+e
+n"
+metadata/_autofit_base_normal_size = 28
+metadata/_autofit_last_applied = "T
+a
+v
+e
+r
+o
+n
+e
+n"
+metadata/_autofit_last_set_size = 27
+metadata/_autofit_last_available_height = 333.0
+
+[node name="LetterAppearSound" type="AudioStreamPlayer" parent="CanvasLayer/TaveronenSign" unique_id=1008777286]
+unique_name_in_owner = true
+stream = ExtResource("5_xmvvs")
+bus = &"SFX"
+
+[node name="ShopPanel" type="Panel" parent="CanvasLayer" unique_id=1731369300]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -235.0
+offset_top = -301.0
+offset_right = -13.0
+offset_bottom = 32.0
+grow_horizontal = 0
+grow_vertical = 2
+theme = ExtResource("2_nlcnu")
+theme_override_styles/panel = SubResource("StyleBoxFlat_8vh3i")
+script = ExtResource("4_sro7e")
+
+[node name="ItemList" type="VBoxContainer" parent="CanvasLayer/ShopPanel" unique_id=2033890090]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 52.0
+offset_bottom = 48.0
+theme_override_constants/separation = 6
+
+[node name="VictoryPanel" type="Panel" parent="CanvasLayer" unique_id=1683536181]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2fxss")
+script = ExtResource("7_xmvvs")
+
+[node name="VictoryCard" type="Panel" parent="CanvasLayer/VictoryPanel" unique_id=1074711038]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -175.0
+offset_right = 325.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gsahv")
+
+[node name="VictoryText" type="RichTextLabel" parent="CanvasLayer/VictoryPanel/VictoryCard" unique_id=1045609936]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_nlcnu")
+theme_override_constants/line_separation = 8
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "VICTORY_BODY"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_jn8xw")
+translation_key = "VICTORY_BODY"
+metadata/_autofit_original_bbcode = "VICTORY_BODY"
+metadata/_autofit_base_normal_size = 15
+metadata/_autofit_last_applied = "VICTORY_BODY"
+metadata/_autofit_last_set_size = 15
+metadata/_autofit_last_available_height = 310.0
+
+[node name="ContinuePlayingButton" type="Button" parent="CanvasLayer/VictoryPanel/VictoryCard" unique_id=1958434811]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 177.0
+offset_right = 220.0
+offset_bottom = 223.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "BTN_KEEP_PLAYING"
+clip_text = true
+script = ExtResource("6_xmvvs")
+
+[node name="ReturnToMenuButton" type="Button" parent="CanvasLayer/VictoryPanel/VictoryCard" unique_id=2064776768]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 226.0
+offset_right = 220.0
+offset_bottom = 272.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "BTN_RETURN_MENU"
+clip_text = true
+script = ExtResource("7_0oyxf")
+
+[node name="GoldMilestonePanel" type="Panel" parent="CanvasLayer" unique_id=1025276729]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_i8861")
+script = ExtResource("7_xmvvs")
+
+[node name="GoldMilestoneCard" type="Panel" parent="CanvasLayer/GoldMilestonePanel" unique_id=565392298]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -175.0
+offset_right = 325.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_i2d7k")
+
+[node name="GoldMilestoneText" type="RichTextLabel" parent="CanvasLayer/GoldMilestonePanel/GoldMilestoneCard" unique_id=2074351517]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_nlcnu")
+theme_override_constants/line_separation = 8
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "GOLD_MILESTONE_BODY"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_jn8xw")
+translation_key = "GOLD_MILESTONE_BODY"
+metadata/_autofit_original_bbcode = "GOLD_MILESTONE_BODY"
+metadata/_autofit_base_normal_size = 15
+metadata/_autofit_last_applied = "GOLD_MILESTONE_BODY"
+metadata/_autofit_last_set_size = 15
+metadata/_autofit_last_available_height = 350.0
+
+[node name="ContinuePlayingButton" type="Button" parent="CanvasLayer/GoldMilestonePanel/GoldMilestoneCard" unique_id=1028972812]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 177.0
+offset_right = 220.0
+offset_bottom = 223.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "BTN_KEEP_PLAYING"
+clip_text = true
+script = ExtResource("6_xmvvs")
+
+[node name="ReturnToMenuButton" type="Button" parent="CanvasLayer/GoldMilestonePanel/GoldMilestoneCard" unique_id=2086951272]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 226.0
+offset_right = 220.0
+offset_bottom = 272.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "BTN_RETURN_MENU"
+clip_text = true
+script = ExtResource("7_0oyxf")
+
+[node name="EscapeMenuPanel" type="Panel" parent="CanvasLayer" unique_id=599178814]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2fxss")
+script = ExtResource("8_0k6b0")
+
+[node name="EscapeMenuCard" type="Panel" parent="CanvasLayer/EscapeMenuPanel" unique_id=2105871436]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -175.0
+offset_right = 325.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_g4rvb")
+
+[node name="ResumeButton" type="Button" parent="CanvasLayer/EscapeMenuPanel/EscapeMenuCard" unique_id=2089568106]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -122.0
+offset_right = 220.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "MENU_CONTINUE"
+clip_text = true
+
+[node name="MainMenuButton" type="Button" parent="CanvasLayer/EscapeMenuPanel/EscapeMenuCard" unique_id=10767108]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 10.0
+offset_right = 220.0
+offset_bottom = 56.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "BTN_RETURN_MENU"
+clip_text = true
+
+[node name="EscapeSettingsButton" type="Button" parent="CanvasLayer/EscapeMenuPanel/EscapeMenuCard" unique_id=1105640905]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -56.0
+offset_right = 220.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "MENU_SETTINGS"
+clip_text = true
+
+[node name="EscapeQuitButton" type="Button" parent="CanvasLayer/EscapeMenuPanel/EscapeMenuCard" unique_id=665486416]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 76.0
+offset_right = 220.0
+offset_bottom = 122.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_nlcnu")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_lsg41")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ycl0h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nu4mv")
+text = "MENU_QUIT"
+clip_text = true
+
+[node name="SettingsPanel" parent="CanvasLayer/EscapeMenuPanel/EscapeMenuCard" unique_id=1446897405 instance=ExtResource("9_0qudn")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="Background" type="Sprite2D" parent="." unique_id=855314701]
+position = Vector2(576, 324)
+texture = ExtResource("10_v6o46")
+
+[node name="FireplaceSlot" type="Marker2D" parent="." unique_id=849752350]
+position = Vector2(576, 550)
+
+[node name="FireplaceSprite" type="AnimatedSprite2D" parent="FireplaceSlot" unique_id=794080252]
+unique_name_in_owner = true
+visible = false
+position = Vector2(36, -18)
+scale = Vector2(1.8359375, 1.71875)
+sprite_frames = SubResource("SpriteFrames_i2d7k")
+autoplay = "default"
+
+[node name="ChairSlot" type="Marker2D" parent="." unique_id=254956587]
+position = Vector2(793, 554)
+
+[node name="ChairSprite" type="Sprite2D" parent="ChairSlot" unique_id=706419000]
+unique_name_in_owner = true
+visible = false
+position = Vector2(-356, 8)
+scale = Vector2(1.4296875, 1.3828125)
+texture = ExtResource("12_8ndtt")
+
+[node name="ChairSlot2" type="Marker2D" parent="." unique_id=1074429804]
+position = Vector2(793, 554)
+
+[node name="ChairSprite2" type="Sprite2D" parent="ChairSlot2" unique_id=285748325]
+unique_name_in_owner = true
+visible = false
+position = Vector2(-678, 8)
+scale = Vector2(1.4296875, 1.3828125)
+texture = ExtResource("12_8ndtt")
+flip_h = true
+
+[node name="TableSlot" type="Marker2D" parent="." unique_id=199592054]
+position = Vector2(692, 573)
+
+[node name="TableSprite" type="Sprite2D" parent="TableSlot" unique_id=547702075]
+unique_name_in_owner = true
+visible = false
+position = Vector2(-417, -12.000015)
+scale = Vector2(2.0234375, 1.4140625)
+texture = ExtResource("13_hpm58")
+
+[node name="BarrelSlot" type="Marker2D" parent="." unique_id=1484944570]
+position = Vector2(454, 599)
+
+[node name="BarrelSprite" type="Sprite2D" parent="BarrelSlot" unique_id=841505908]
+unique_name_in_owner = true
+visible = false
+position = Vector2(328.99997, -14)
+scale = Vector2(1.2421875, 1.3359375)
+texture = ExtResource("14_1nelu")
+
+[node name="BarCounterSlot" type="Marker2D" parent="." unique_id=1133557360]
+position = Vector2(1070, 587)
+
+[node name="BarCounterSprite" type="Sprite2D" parent="BarCounterSlot" unique_id=339112318]
+unique_name_in_owner = true
+visible = false
+position = Vector2(-52.00006, -57)
+scale = Vector2(1.2421875, 1.3359375)
+texture = ExtResource("15_gnpbg")
+
+[node name="TorchSlot" type="Marker2D" parent="." unique_id=1334091255]
+position = Vector2(95, 232)
+
+[node name="TorchSprite" type="AnimatedSprite2D" parent="TorchSlot" unique_id=1680734355]
+unique_name_in_owner = true
+visible = false
+position = Vector2(23, 117.5)
+scale = Vector2(1.2, 1.1642857)
+sprite_frames = SubResource("SpriteFrames_tsgqx")
+autoplay = "default"
+
+[node name="DragonTrophySlot" type="Marker2D" parent="." unique_id=520943058]
+position = Vector2(516, 253)
+
+[node name="DragonTrophySprite" type="AnimatedSprite2D" parent="DragonTrophySlot" unique_id=1363274699]
+unique_name_in_owner = true
+visible = false
+sprite_frames = SubResource("SpriteFrames_624bs")
+animation = &"blink"
+autoplay = "blink"
+script = ExtResource("18_q3x83")
+
+[node name="ItemAppearSound" type="AudioStreamPlayer" parent="." unique_id=445319478]
+unique_name_in_owner = true
+stream = ExtResource("19_s2vse")
+bus = &"SFX"
+
+[node name="CoinSound" type="AudioStreamPlayer" parent="." unique_id=102631007]
+unique_name_in_owner = true
+stream = ExtResource("20_4ngsn")
+bus = &"SFX"
+
+[node name="DayNightModulate" type="CanvasModulate" parent="." unique_id=1776926314]
+script = ExtResource("21_nlcnu")
+
+[node name="DustMotes" type="CPUParticles2D" parent="." unique_id=652451414]
+position = Vector2(576, 324)
+script = ExtResource("22_5srvo")
+
+[editable path="CanvasLayer/EscapeMenuPanel/EscapeMenuCard/SettingsPanel"]

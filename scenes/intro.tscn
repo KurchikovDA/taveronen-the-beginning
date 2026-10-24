@@ -1,0 +1,140 @@
+[gd_scene format=3 uid="uid://d4a8mq4t1csad"]
+
+[ext_resource type="Texture2D" uid="uid://dlq12id4g763y" path="res://assets/furniture/tavern_background.png" id="1_s2ta7"]
+[ext_resource type="Theme" uid="uid://b1p02b6oy651c" path="res://assets/game_theme.tres" id="2_ayt76"]
+[ext_resource type="Script" uid="uid://dt5lvnen14ka4" path="res://scripts/ui/translated_rich_text.gd" id="3_0a7ni"]
+[ext_resource type="Script" uid="uid://dqqyngce8q83c" path="res://scripts/ui/continue_button.gd" id="3_7a8ye"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s2ta7"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.17165771, 0.10453472, 0.15124407, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7882353, 0.627451, 0.2901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i2d7k"]
+bg_color = Color(0.16470589, 0.14117648, 0.1254902, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7a8ye"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_size = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ayt76"]
+bg_color = Color(0.22745098, 0.19607843, 0.15686275, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 3
+
+[node name="IntroScene" type="Control" unique_id=1254939499]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=805536389]
+modulate = Color(0.2901961, 0.2901961, 0.2901961, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_s2ta7")
+
+[node name="StoryPanel" type="Panel" parent="." unique_id=1855492846]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_s2ta7")
+
+[node name="StoryText" type="RichTextLabel" parent="StoryPanel" unique_id=908908957]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_ayt76")
+theme_override_constants/line_separation = 6
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "STORY_INTRO"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_0a7ni")
+translation_key = "STORY_INTRO"
+metadata/_autofit_original_bbcode = "STORY_INTRO"
+metadata/_autofit_base_normal_size = 15
+metadata/_autofit_last_applied = "STORY_INTRO"
+metadata/_autofit_last_set_size = 15
+metadata/_autofit_last_available_height = 360.0
+
+[node name="ContinueButton" type="Button" parent="." unique_id=919203778]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 204.5
+offset_right = 220.0
+offset_bottom = 250.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_ayt76")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_i2d7k")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_7a8ye")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ayt76")
+text = "MENU_CONTINUE"
+clip_text = true
+script = ExtResource("3_7a8ye")

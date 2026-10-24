@@ -1,0 +1,265 @@
+[gd_scene format=3 uid="uid://dp1twep228bcd"]
+
+[ext_resource type="Script" uid="uid://doy10nn8gdeel" path="res://scripts/ui/settings_panel.gd" id="1_ys8gc"]
+[ext_resource type="Theme" uid="uid://b1p02b6oy651c" path="res://assets/game_theme.tres" id="2_lsrvi"]
+[ext_resource type="Script" uid="uid://cd0pexqi60bgu" path="res://scripts/ui/settings_back_button.gd" id="3_xkl6r"]
+[ext_resource type="Texture2D" uid="uid://d03glhgnaigv6" path="res://assets/menu/settings/gem_grabber.png" id="4_elusd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tsgqx"]
+bg_color = Color(0, 0, 0, 0.7058824)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dy7ct"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.11170886, 0.113138534, 0.23486263, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0o4t1"]
+bg_color = Color(0.16470589, 0.14117648, 0.1254902, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0k4wn"]
+bg_color = Color(0.10980392, 0.09411765, 0.078431375, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.65882355, 0.5254902, 0.22745098, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_size = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j5v2v"]
+bg_color = Color(0.22745098, 0.19607843, 0.15686275, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.9411765, 0.8156863, 0.3764706, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.47058824)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u5051"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.16470589, 0.14117648, 0.1254902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2901961, 0.2, 0.1254902, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2sba"]
+bg_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ai24q"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SettingsPanel" type="Panel" unique_id=1446897405]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tsgqx")
+script = ExtResource("1_ys8gc")
+
+[node name="SettingsCard" type="Panel" parent="." unique_id=937886837]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -175.0
+offset_right = 325.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dy7ct")
+
+[node name="SettingsTitle" type="Label" parent="SettingsCard" unique_id=1052146698]
+layout_mode = 0
+offset_left = 175.0
+offset_top = 15.0
+offset_right = 475.0
+offset_bottom = 55.0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 23
+text = "MENU_SETTINGS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SettingsBackButton" type="Button" parent="SettingsCard" unique_id=1975718519]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 179.935
+offset_right = 220.0
+offset_bottom = 225.935
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_0o4t1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0k4wn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j5v2v")
+text = "BTN_BACK"
+clip_text = true
+script = ExtResource("3_xkl6r")
+
+[node name="MusicVolumeLabel" type="Label" parent="SettingsCard" unique_id=1709547880]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 100.0
+offset_right = 590.0
+offset_bottom = 123.0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 23
+text = "MUSIC_VOLUME"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="SettingsCard" unique_id=61882442]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 60.0
+offset_top = 120.0
+offset_right = 590.0
+offset_bottom = 150.0
+theme_override_icons/grabber = ExtResource("4_elusd")
+theme_override_icons/grabber_highlight = ExtResource("4_elusd")
+theme_override_styles/slider = SubResource("StyleBoxFlat_u5051")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_v2sba")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_ai24q")
+value = 100.0
+
+[node name="SFXVolumeLabel" type="Label" parent="SettingsCard" unique_id=1055739457]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 170.0
+offset_right = 590.0
+offset_bottom = 193.0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 23
+text = "SFX_VOLUME"
+
+[node name="SFXVolumeSlider" type="HSlider" parent="SettingsCard" unique_id=853966679]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 60.0
+offset_top = 190.0
+offset_right = 590.0
+offset_bottom = 220.0
+theme_override_icons/grabber = ExtResource("4_elusd")
+theme_override_icons/grabber_highlight = ExtResource("4_elusd")
+theme_override_styles/slider = SubResource("StyleBoxFlat_u5051")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_v2sba")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_ai24q")
+value = 100.0
+
+[node name="LanguageLabel" type="Label" parent="SettingsCard" unique_id=2135575794]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 240.0
+offset_right = 300.0
+offset_bottom = 263.0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 20
+text = "LANGUAGE_LABEL"
+
+[node name="LanguagePrevButton" type="Button" parent="SettingsCard" unique_id=164829392]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 60.0
+offset_top = 273.0
+offset_right = 104.0
+offset_bottom = 319.0
+focus_mode = 0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_0o4t1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0k4wn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j5v2v")
+text = "<"
+clip_text = true
+
+[node name="LanguageValueLabel" type="Label" parent="SettingsCard" unique_id=1999708937]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 114.0
+offset_top = 257.0
+offset_right = 536.0
+offset_bottom = 319.0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 46
+text = "ENGLISH"
+horizontal_alignment = 1
+vertical_alignment = 2
+clip_text = true
+metadata/autofit_max_size = 46
+
+[node name="LanguageNextButton" type="Button" parent="SettingsCard" unique_id=1649277052]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 546.0
+offset_top = 273.0
+offset_right = 590.0
+offset_bottom = 319.0
+focus_mode = 0
+theme = ExtResource("2_lsrvi")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_0o4t1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0k4wn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j5v2v")
+text = ">"
+clip_text = true
