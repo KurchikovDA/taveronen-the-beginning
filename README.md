@@ -1,5 +1,7 @@
 # Taveronen: The Beginning
 
+[![GUT tests](https://github.com/KurchikovDA/taveronen-the-beginning/actions/workflows/tests.yml/badge.svg)](https://github.com/KurchikovDA/taveronen-the-beginning/actions/workflows/tests.yml)
+
 A small tavern game made in Godot 4, released on itch.io in 7 languages, with a suite of automated tests written in GUT (Godot Unit Test).
 
 This repository is part of my QA portfolio: it shows a finished game and the automated tests I wrote for it.
