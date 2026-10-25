@@ -33,7 +33,7 @@ jobs:
       - name: Import the project
         run: godot --headless --import || true
 
-      # Step 4: run all tests from res://test (with subfolders) without a window.
+      # Step 4: run all tests without a window. Which folders to scan is set in .gutconfig.json.
       # -gexit closes Godot after the run; failed tests make this step fail (red cross)
       - name: Run GUT tests
-        run: godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://test -ginclude_subdirs -gexit
+        run: godot --headless -s addons/gut/gut_cmdln.gd -gexit
