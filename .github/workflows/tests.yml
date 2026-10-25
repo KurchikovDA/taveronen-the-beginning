@@ -1,0 +1,39 @@
+# Name of the workflow, it is shown in the Actions tab on GitHub
+name: GUT tests
+
+# When to run: on every push to any branch, and also by hand with a button
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    # GitHub gives us a clean Ubuntu (Linux) computer for each run
+    runs-on: ubuntu-latest
+
+    # Godot version in one place, so it is easy to change later
+    env:
+      GODOT_VERSION: "4.7.2"
+
+    steps:
+      # Step 1: copy the project from the repository to the computer
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # Step 2: download Godot (Linux build) and make it a "godot" command
+      - name: Install Godot
+        run: |
+          wget -q https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+          unzip -q Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+          sudo mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      # Step 3: the .godot folder is not in the repository, so import the project
+      # once to build it. "|| true" means: do not fail if Godot exits with a warning
+      - name: Import the project
+        run: godot --headless --import || true
+
+      # Step 4: run all tests from res://test (with subfolders) without a window.
+      # -gexit closes Godot after the run; failed tests make this step fail (red cross)
+      - name: Run GUT tests
+        run: godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://test -ginclude_subdirs -gexit
