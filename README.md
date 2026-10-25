@@ -40,8 +40,9 @@ A test that loads a save file with `language_index = 99` failed: the game took t
 
 1. Open the project in Godot 4.7 (Project Manager, Import, choose `project.godot`).
 2. Make sure the GUT plugin is enabled (Project, Project Settings, Plugins). A GUT panel appears at the bottom of the editor.
-3. In the GUT panel open the settings and set the test directory to `res://test` with "Include Subdirs" turned on.
-4. Press "Run All".
+3. In the GUT panel press "Run All". The settings are read from `.gutconfig.json`. If the panel shows no tests, check that the test directory is `res://test` and "Include Subdirs" is turned on.
+
+The same tests also run automatically on GitHub on every push (see the badge at the top and the Actions tab).
 
 ## Known limitations
 
