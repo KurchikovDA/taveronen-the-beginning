@@ -166,3 +166,36 @@ func test_reaching_10000_gold_after_victory_shows_easter_egg_with_music() -> voi
 	var saved: Dictionary = JSON.parse_string(file_text) # turn the JSON text into a dictionary
 	# Check 8: the seen flag is written into the save file
 	assert_true(saved.get("gold_milestone_seen", false), "gold_milestone_seen should be saved in the file") # get(key, default) gives false if the key is missing
+
+
+# Keep Playing button on the easter egg screen
+## WHAT: brings up the hidden "Legend of Gold" screen, presses its real "Keep Playing" button and then adds more gold.
+## WHY: this button uses the same script as the one on the victory screen, but sits in another panel. It must close this screen, bring back the tavern music, and the easter egg must never show a second time.
+## PASSES when: the screen is hidden, the victory music stops, the tavern music plays again and the screen stays hidden after more gold is added. FAILS when any of these does not happen.
+func test_keep_playing_on_easter_egg_resumes_music_and_egg_never_repeats() -> void: # Name starts with test_ so GUT runs it
+	GameManager.victory_continued = true # the player has already finished the tavern and pressed Keep Playing (without it the easter egg is locked)
+	GameManager.gold = 9000 # far enough from 10000: the game adds 1 gold per second while the test runs, so we keep a safe distance
+	GameManager.play_tavern_theme() # start the tavern music, like the game does
+	var tavern: Node = add_child_autoqfree(load("res://scenes/tavern.tscn").instantiate()) # the real tavern scene, placed into the test and removed after it
+	await wait_process_frames(2) # let the scene finish its _ready and connect to the milestone signal
+	var milestone_panel: Panel = tavern.get_node("%GoldMilestonePanel") # % finds a node by its unique name: the easter egg screen
+	var button: Button = tavern.get_node("CanvasLayer/GoldMilestonePanel/GoldMilestoneCard/ContinuePlayingButton") # the real button (the full path is needed, the victory screen has a button with the same name)
+
+	GameManager.add_gold(1000) # 9000 + 1000 = 10000, the milestone is reached and the easter egg screen opens
+
+	# Check 1: before the press the easter egg screen is shown
+	assert_true(milestone_panel.visible, "The easter egg screen should be shown before the button is pressed")
+
+	button.pressed.emit() # press the button, like a click of the player
+
+	# Check 2: the easter egg screen is hidden after the press
+	assert_false(milestone_panel.visible, "The easter egg screen should be hidden after pressing Keep Playing")
+	# Check 3: the victory music is stopped
+	assert_false(GameManager.victory_music.playing, "The victory music should stop after pressing Keep Playing")
+	# Check 4: the tavern music is playing again, not paused
+	assert_true(GameManager.tavern_music.playing and not GameManager.tavern_music.stream_paused, "The tavern music should play again after pressing Keep Playing") # "and not" = both must be true: it plays AND it is not paused
+
+	GameManager.add_gold(1) # more gold after the milestone: the easter egg must not come back
+
+	# Check 5: more gold does not open the easter egg screen a second time
+	assert_false(milestone_panel.visible, "The easter egg screen should never show a second time")
