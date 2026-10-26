@@ -1,0 +1,95 @@
+extends GutTest # "I am a test file" - GUT (Godot Unit Test) can now find and run me
+# Checks the real tavern scene: pressing a button of the real shop changes the real GameManager.
+
+# Path of the fake save file used ONLY by these tests.
+# user:// = the game's user data folder. The real game uses save.json, so we never touch it.
+const TEST_SAVE_PATH: String = "user://test_integration_save.json"
+
+var real_save_path: String # the real save path of the running game, put back in after_each
+var real_state: Dictionary # a copy of the real GameManager values, put back in after_each
+
+
+# Setup before every test
+## WHAT: remembers the real GameManager values, points it to the test save file and starts from a clean game.
+## WHY: this test uses the REAL GameManager (the autoload of the game, not a new object), so everything the test changes would otherwise end up in the real save.json.
+## HOW IT RUNS: GUT calls a function with exactly this name (before_each) automatically before every test in this file. It is not a test, so it has no check inside.
+func before_each() -> void: # The name before_each is special, GUT looks for it. It has no test_ at the start on purpose
+	real_save_path = GameManager.SAVE_PATH # remember the real path first
+	real_state = { # a copy of every value that save_game writes to the file
+		"gold": GameManager.gold,
+		"purchased_items": GameManager.purchased_items.duplicate(), # duplicate = a separate copy, so later changes do not touch it
+		"language_index": GameManager.language_index,
+		"music_volume": GameManager.music_volume,
+		"sfx_volume": GameManager.sfx_volume,
+		"game_started": GameManager.game_started,
+		"item_purchase_progress": GameManager.item_purchase_progress.duplicate(),
+		"item_bonus_threshold": GameManager.item_bonus_threshold.duplicate(),
+		"gold_milestone_seen": GameManager.gold_milestone_seen,
+		"victory_continued": GameManager.victory_continued,
+	}
+	GameManager.SAVE_PATH = TEST_SAVE_PATH # from this line on, every save goes to the test file
+	GameManager.reset_game() # a clean game: no gold, nothing bought (it writes the TEST file, not the real one)
+
+
+	# Cleanup after every test
+## WHAT: puts every real GameManager value back and deletes the test save file.
+## WHY: the next test (and the real game running next to the tests) must see the same GameManager as before.
+## HOW IT RUNS: GUT calls a function with exactly this name (after_each) automatically after every test in this file. It is not a test, so it has no check inside.
+func after_each() -> void: # The name after_each is special, GUT looks for it. It has no test_ at the start on purpose
+	GameManager.stop_victory_theme() # stop the victory music if the test started it
+	GameManager.stop_tavern_theme() # stop the tavern music if the test started it
+	GameManager.resume_tavern_theme() # take the tavern player off pause (the victory screen pauses it)
+	GameManager.gold = real_state["gold"] # put the gold back
+	GameManager.purchased_items.clear() # empty the list, then fill it with the real items
+	GameManager.purchased_items.append_array(real_state["purchased_items"]) # append_array adds all items of another list
+	GameManager.language_index = real_state["language_index"] # put the language back
+	GameManager.music_volume = real_state["music_volume"] # put the music volume back
+	GameManager.sfx_volume = real_state["sfx_volume"] # put the sound effects volume back
+	GameManager.game_started = real_state["game_started"] # put the "game in progress" flag back
+	GameManager.item_purchase_progress = real_state["item_purchase_progress"] # put the bonus waiting times back
+	GameManager.item_bonus_threshold = real_state["item_bonus_threshold"] # put the bonus thresholds back
+	GameManager.gold_milestone_seen = real_state["gold_milestone_seen"] # put the milestone flag back
+	GameManager.victory_continued = real_state["victory_continued"] # put the victory flag back
+	GameManager.SAVE_PATH = real_save_path # LAST: only now saves go to the real file again
+	if FileAccess.file_exists(TEST_SAVE_PATH): # only delete if the test created the file
+		DirAccess.remove_absolute(TEST_SAVE_PATH) # remove it from disk
+
+
+# Victory after the last purchase
+## WHAT: gives 1800 gold, opens the real tavern, presses the button of every shop item one by one and waits for the victory screen.
+## WHY: the unit tests check the pieces (prices, gold, saving). This test checks the whole ending together: the last purchase, the delay, the victory screen and the music switch.
+## PASSES when: all 7 items are bought, the victory screen is hidden right after the last purchase, appears after the 5 second delay, the victory music plays and the tavern music is paused. FAILS when any of these does not happen.
+func test_buying_all_items_shows_victory_screen_and_music() -> void: # Name starts with test_ so GUT runs it
+	GameManager.gold = 1800 # all 7 prices add up to 1800, set BEFORE the scene opens so the shop draws every button as affordable
+	GameManager.play_tavern_theme() # start the tavern music, like the game does, so Check 2 and Check 7 have something to check
+	var tavern: Node = add_child_autoqfree(load("res://scenes/tavern.tscn").instantiate()) # the real tavern scene, placed into the test and removed after it
+	await wait_process_frames(2) # let the scene finish its _ready and its first frames (await = wait here, then go on)
+	var shop: Node = tavern.get_node("CanvasLayer/ShopPanel") # the real shop panel, its script holds the list of items
+	var victory_panel: Panel = tavern.get_node("%VictoryPanel") # % finds a node by its unique name: the victory screen
+
+	# Check 1: before any purchase the victory screen is hidden
+	assert_false(victory_panel.visible, "The victory screen should be hidden before the purchases")
+	# Check 2: before any purchase the tavern music is playing
+	assert_true(GameManager.tavern_music.playing, "The tavern music should be playing before the victory")
+
+	for item in shop.items: # Runs the lines below once per shop item. "item" is the current item (one dictionary)
+		var button: Button = tavern.get_node("CanvasLayer/ShopPanel/ItemList/" + item["id"]) # the real button of this item, its name is the item id
+		button.pressed.emit() # press the button, like a click of the player
+
+	await wait_process_frames(2) # the bought buttons are removed at the end of the frame
+
+	# Check 3: every item of the shop is bought
+	assert_eq(GameManager.purchased_items.size(), shop.items.size(), "Every shop item should be bought")
+	# Check 4: right after the last purchase the victory screen is not there yet, the game waits first
+	assert_false(victory_panel.visible, "The victory screen should wait for its delay after the last purchase")
+	
+	await wait_seconds(5.5) # the game waits 5 seconds (VICTORY_DELAY_SECONDS in shop_panel.gd), we wait a bit longer
+	
+	# Check 5: after the delay the victory screen is shown
+	assert_true(victory_panel.visible, "The victory screen should appear after the delay")
+	# Check 6: the victory music is playing
+	assert_true(GameManager.victory_music.playing, "The victory music should be playing on the victory screen")
+	# Check 7: the tavern music is paused, not stopped (it must continue after "Keep Playing")
+	assert_true(GameManager.tavern_music.stream_paused, "The tavern music should be paused on the victory screen")
+	# Check 8: the player has not pressed anything yet, so the victory is not marked as continued
+	assert_false(GameManager.victory_continued, "The victory should not be marked as continued before a button is pressed")
