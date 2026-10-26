@@ -42,11 +42,11 @@ func test_music_players_use_music_bus() -> void: # Name starts with test_ so GUT
 	# Check 1: the bus named Music exists in the project (get_bus_index answers -1 when there is no such bus)
 	assert_ne(AudioServer.get_bus_index("Music"), -1, "The project should have a bus named Music")
 	# Check 2: the tavern music goes through the Music bus
-	assert_eq(game_manager.tavern_music.bus, &"Music", "The tavern music should use the Music bus") # &"Music" is a name written as a StringName, the type the bus property has
+	assert_eq(game_manager.tavern_music.bus, &"Music", "The tavern music should use the Music bus") # bus = the name of the volume channel the player sends its sound to. &"Music" is a special name type (StringName) written with & before the quotes: it is the same text "Music", but this is the form Godot stores in the bus property, so we compare like with like
 	# Check 3: the victory music goes through the Music bus
-	assert_eq(game_manager.victory_music.bus, &"Music", "The victory music should use the Music bus")
+	assert_eq(game_manager.victory_music.bus, &"Music", "The victory music should use the Music bus") # same as above: the bus name &"Music" must be the name the player really has
 	# Check 4: the main menu music goes through the Music bus
-	assert_eq(menu_music.bus, &"Music", "The main menu music should use the Music bus")
+	assert_eq(menu_music.bus, &"Music", "The main menu music should use the Music bus") # same check for the main menu player
 
 
 # SFX bus
@@ -62,10 +62,23 @@ func test_sound_effect_players_use_sfx_bus() -> void: # Name starts with test_ s
 	# Check 1: the bus named SFX exists in the project (get_bus_index answers -1 when there is no such bus)
 	assert_ne(AudioServer.get_bus_index("SFX"), -1, "The project should have a bus named SFX")
 	# Check 2: the menu hover sound goes through the SFX bus
-	assert_eq(hover_sound.bus, &"SFX", "The menu hover sound should use the SFX bus")
+	assert_eq(hover_sound.bus, &"SFX", "The menu hover sound should use the SFX bus") # SFX = sound effects. The bus named SFX is the channel the "Sound effects" slider controls. &"SFX" is the name as a StringName (see the Music test above)
 	# Check 3: the sign letter sound goes through the SFX bus
-	assert_eq(letter_sound.bus, &"SFX", "The sign letter sound should use the SFX bus")
+	assert_eq(letter_sound.bus, &"SFX", "The sign letter sound should use the SFX bus") # the player must send its sound to the SFX channel
 	# Check 4: the item appearing sound goes through the SFX bus
-	assert_eq(item_sound.bus, &"SFX", "The item appearing sound should use the SFX bus")
+	assert_eq(item_sound.bus, &"SFX", "The item appearing sound should use the SFX bus") # the player must send its sound to the SFX channel
 	# Check 5: the coin sound goes through the SFX bus
-	assert_eq(coin_sound.bus, &"SFX", "The coin sound should use the SFX bus")
+	assert_eq(coin_sound.bus, &"SFX", "The coin sound should use the SFX bus") # the player must send its sound to the SFX channel
+
+
+# Main menu music
+## WHAT: reads two settings of the main menu music player: whether it starts by itself and which audio file it plays.
+## WHY: the menu has no code that starts its music, it relies on the autoplay setting of the player. If autoplay is switched off or the wrong track is chosen, the menu is silent or plays the wrong theme, and no other test would notice.
+## PASSES when: autoplay is on and the player plays the menu theme file. FAILS when autoplay is off or another file is set.
+func test_main_menu_music_starts_by_itself_and_plays_menu_theme() -> void: # Name starts with test_ so GUT runs it
+	var menu_music: AudioStreamPlayer = menu.get_node("MenuMusic") # the music player of the main menu, found by its name in the scene
+
+	# Check 1: the menu music starts by itself when the menu opens
+	assert_true(menu_music.autoplay, "The main menu music should start by itself (autoplay)") # autoplay = true means the player starts as soon as the scene opens
+	# Check 2: the player plays the menu theme file, not another track
+	assert_eq(menu_music.stream.resource_path, "res://assets/audio/menu_theme_5min.ogg", "The main menu should play the menu theme") # resource_path = the path of the audio file that was loaded into the player
