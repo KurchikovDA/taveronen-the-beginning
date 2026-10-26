@@ -19,4 +19,9 @@ func _on_pressed() -> void:
 		GameManager.save_game()
 	GameManager.stop_victory_theme()
 	GameManager.stop_tavern_theme()
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	_go_to_main_menu() # Open the main menu (the scene change lives in its own function below)
+
+# Opens the main menu scene.
+# Kept as a separate function so a test can replace it: a real scene change would destroy the test runner.
+func _go_to_main_menu() -> void:
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn") # Swap the whole current scene for the main menu
