@@ -127,3 +127,42 @@ func test_keep_playing_button_closes_victory_screen_and_resumes_tavern_music() -
 	var saved: Dictionary = JSON.parse_string(file_text) # turn the JSON (JavaScript Object Notation) text into a dictionary
 	# Check 6: the continued victory is written into the save file
 	assert_true(saved.get("victory_continued", false), "victory_continued should be saved in the file") # get(key, default) gives false if the key is missing
+
+
+# Gold milestone easter egg
+## WHAT: opens the real tavern after a finished victory, adds gold up to the 10000 milestone and watches the hidden "Legend of Gold" screen.
+## WHY: the easter egg must appear exactly once the player has finished the tavern and earned 10000 gold, with the victory music, and it must be remembered in the save so it never shows twice.
+## PASSES when: the screen is hidden below 10000 gold, shown at 10000, the victory music plays, the tavern music is paused and the milestone is saved in the file. FAILS when any of these does not happen.
+func test_reaching_10000_gold_after_victory_shows_easter_egg_with_music() -> void: # Name starts with test_ so GUT runs it
+	GameManager.victory_continued = true # the player has already finished the tavern and pressed Keep Playing (without it the easter egg is locked)
+	GameManager.gold = 9000 # far enough from 10000: the game adds 1 gold per second while the test runs, so we keep a safe distance
+	GameManager.play_tavern_theme() # start the tavern music, like the game does
+	var tavern: Node = add_child_autoqfree(load("res://scenes/tavern.tscn").instantiate()) # the real tavern scene, placed into the test and removed after it
+	await wait_process_frames(2) # let the scene finish its _ready and its first frames
+	var milestone_panel: Panel = tavern.get_node("%GoldMilestonePanel") # % finds a node by its unique name: the easter egg screen
+
+	# Check 1: before the milestone the easter egg screen is hidden
+	assert_false(milestone_panel.visible, "The easter egg screen should be hidden at the start")
+
+	GameManager.add_gold(500) # 9000 + 500 = 9500, still below the milestone
+
+	# Check 2: below 10000 gold the easter egg screen stays hidden
+	assert_false(milestone_panel.visible, "The easter egg screen should stay hidden below 10000 gold")
+	# Check 3: below 10000 gold the easter egg is not marked as seen
+	assert_false(GameManager.gold_milestone_seen, "The easter egg should not be marked as seen below 10000 gold")
+
+	GameManager.add_gold(500) # 9500 + 500 = 10000, the milestone is reached
+
+	# Check 4: at 10000 gold the easter egg screen is shown
+	assert_true(milestone_panel.visible, "The easter egg screen should appear at 10000 gold")
+	# Check 5: the victory music is playing on the easter egg screen
+	assert_true(GameManager.victory_music.playing, "The victory music should play on the easter egg screen")
+	# Check 6: the tavern music is paused, not stopped (it must continue after "Keep Playing")
+	assert_true(GameManager.tavern_music.stream_paused, "The tavern music should be paused on the easter egg screen")
+	# Check 7: the easter egg is marked as seen, so it can never show twice
+	assert_true(GameManager.gold_milestone_seen, "The easter egg should be marked as seen after it appeared")
+
+	var file_text: String = FileAccess.get_file_as_string(TEST_SAVE_PATH) # read the whole test save file as text
+	var saved: Dictionary = JSON.parse_string(file_text) # turn the JSON text into a dictionary
+	# Check 8: the seen flag is written into the save file
+	assert_true(saved.get("gold_milestone_seen", false), "gold_milestone_seen should be saved in the file") # get(key, default) gives false if the key is missing
