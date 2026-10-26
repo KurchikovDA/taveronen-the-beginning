@@ -1,5 +1,5 @@
 extends GutTest # "I am a test file" - GUT (Godot Unit Test) can now find and run me
-# Checks the whole ending on the real tavern scene: the victory screen, its music and its buttons.
+# Checks the whole ending with the real GameManager: the victory screen, its music and its buttons.
 
 # Path of the fake save file used ONLY by these tests.
 # user:// = the game's user data folder. The real game uses save.json, so we never touch it.
@@ -199,3 +199,34 @@ func test_keep_playing_on_easter_egg_resumes_music_and_egg_never_repeats() -> vo
 
 	# Check 5: more gold does not open the easter egg screen a second time
 	assert_false(milestone_panel.visible, "The easter egg screen should never show a second time")
+
+
+# Return to Main Menu button
+## WHAT: puts a copy of the real "Return to Main Menu" button into the test, replaces its scene change with an empty stub and presses it.
+## WHY: this button must remember the victory, save it, stop all music and open the main menu. The real scene change would destroy the test runner, so the test only checks that the button asked for it.
+## PASSES when: the victory is marked as continued and saved, both musics are stopped and the button asked for the main menu exactly once. FAILS when any of these does not happen.
+func test_return_to_menu_button_saves_victory_stops_music_and_opens_menu() -> void: # Name starts with test_ so GUT runs it
+	var button: Button = partial_double(load("res://scripts/ui/return_to_menu_button.gd")).new() # a copy of the real button script: all functions are real...
+	add_child_autoqfree(button) # put the button into the test, so its _ready runs and connects the press (it is removed after the test)
+	stub(button, "_go_to_main_menu").to_do_nothing() # ...except this one: the real scene change would destroy the test runner, so it does nothing now
+	GameManager.play_tavern_theme() # start the tavern music, like the game does
+	GameManager.play_victory_theme() # the victory screen is open: the tavern music is paused and the victory music plays
+
+	# Check 1: before the press the victory is not marked as continued
+	assert_false(GameManager.victory_continued, "The victory should not be marked as continued before the button is pressed")
+
+	button.pressed.emit() # press the button, like a click of the player
+
+	# Check 2: the victory is marked as continued
+	assert_true(GameManager.victory_continued, "The victory should be marked as continued after pressing Return to Main Menu")
+	# Check 3: the victory music is stopped
+	assert_false(GameManager.victory_music.playing, "The victory music should stop after pressing Return to Main Menu")
+	# Check 4: the tavern music is stopped too, the main menu has its own music
+	assert_false(GameManager.tavern_music.playing, "The tavern music should stop after pressing Return to Main Menu")
+	# Check 5: the button asked to open the main menu exactly once
+	assert_called_count(button._go_to_main_menu, 1) # (the function itself, how many times); GUT writes the failure message itself
+
+	var file_text: String = FileAccess.get_file_as_string(TEST_SAVE_PATH) # read the whole test save file as text
+	var saved: Dictionary = JSON.parse_string(file_text) # turn the JSON text into a dictionary
+	# Check 6: the continued victory is written into the save file
+	assert_true(saved.get("victory_continued", false), "victory_continued should be saved in the file") # get(key, default) gives false if the key is missing
