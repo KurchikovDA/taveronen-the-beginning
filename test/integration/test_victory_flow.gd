@@ -230,3 +230,23 @@ func test_return_to_menu_button_saves_victory_stops_music_and_opens_menu() -> vo
 	var saved: Dictionary = JSON.parse_string(file_text) # turn the JSON text into a dictionary
 	# Check 6: the continued victory is written into the save file
 	assert_true(saved.get("victory_continued", false), "victory_continued should be saved in the file") # get(key, default) gives false if the key is missing
+
+
+# Tavern music after returning to the main menu
+## WHAT: opens the victory screen state, presses the real "Return to Main Menu" button, and then starts the tavern theme again, as the "Continue" button of the main menu does.
+## WHY: the victory screen pauses the tavern music, and the stop function only stops music that is playing. If the pause stays, the next game would start without any music.
+## PASSES when: after returning to the menu and starting the tavern theme again, the tavern music plays and is not paused. FAILS when it stays silent.
+func test_tavern_music_plays_again_after_returning_to_menu_from_victory() -> void: # Name starts with test_ so GUT runs it
+	var button: Button = partial_double(load("res://scripts/ui/return_to_menu_button.gd")).new() # a copy of the real button script: all functions are real...
+	add_child_autoqfree(button) # put the button into the test, so its _ready runs and connects the press (it is removed after the test)
+	stub(button, "_go_to_main_menu").to_do_nothing() # ...except this one: the real scene change would destroy the test runner, so it does nothing now
+	GameManager.play_tavern_theme() # start the tavern music, like the game does
+	GameManager.play_victory_theme() # the victory screen is open: the tavern music is paused and the victory music plays
+
+	button.pressed.emit() # the player presses Return to Main Menu
+	GameManager.play_tavern_theme() # the player presses Continue in the main menu: this is the call it makes
+
+	# Check 1: the tavern music is playing again
+	assert_true(GameManager.tavern_music.playing, "The tavern music should be playing after the next Continue")
+	# Check 2: the tavern music is not stuck on pause (a paused player plays nothing)
+	assert_false(GameManager.tavern_music.stream_paused, "The tavern music should not stay paused after the next Continue")
