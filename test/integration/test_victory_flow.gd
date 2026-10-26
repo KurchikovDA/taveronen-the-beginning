@@ -1,5 +1,5 @@
 extends GutTest # "I am a test file" - GUT (Godot Unit Test) can now find and run me
-# Checks the real tavern scene: pressing a button of the real shop changes the real GameManager.
+# Checks the whole ending on the real tavern scene: the victory screen, its music and its buttons.
 
 # Path of the fake save file used ONLY by these tests.
 # user:// = the game's user data folder. The real game uses save.json, so we never touch it.
@@ -11,7 +11,7 @@ var real_state: Dictionary # a copy of the real GameManager values, put back in 
 
 # Setup before every test
 ## WHAT: remembers the real GameManager values, points it to the test save file and starts from a clean game.
-## WHY: this test uses the REAL GameManager (the autoload of the game, not a new object), so everything the test changes would otherwise end up in the real save.json.
+## WHY: these tests use the REAL GameManager (the autoload of the game, not a new object), so everything the tests change would otherwise end up in the real save.json.
 ## HOW IT RUNS: GUT calls a function with exactly this name (before_each) automatically before every test in this file. It is not a test, so it has no check inside.
 func before_each() -> void: # The name before_each is special, GUT looks for it. It has no test_ at the start on purpose
 	real_save_path = GameManager.SAVE_PATH # remember the real path first
@@ -31,7 +31,7 @@ func before_each() -> void: # The name before_each is special, GUT looks for it.
 	GameManager.reset_game() # a clean game: no gold, nothing bought (it writes the TEST file, not the real one)
 
 
-	# Cleanup after every test
+# Cleanup after every test
 ## WHAT: puts every real GameManager value back and deletes the test save file.
 ## WHY: the next test (and the real game running next to the tests) must see the same GameManager as before.
 ## HOW IT RUNS: GUT calls a function with exactly this name (after_each) automatically after every test in this file. It is not a test, so it has no check inside.
@@ -82,9 +82,9 @@ func test_buying_all_items_shows_victory_screen_and_music() -> void: # Name star
 	assert_eq(GameManager.purchased_items.size(), shop.items.size(), "Every shop item should be bought")
 	# Check 4: right after the last purchase the victory screen is not there yet, the game waits first
 	assert_false(victory_panel.visible, "The victory screen should wait for its delay after the last purchase")
-	
+
 	await wait_seconds(5.5) # the game waits 5 seconds (VICTORY_DELAY_SECONDS in shop_panel.gd), we wait a bit longer
-	
+
 	# Check 5: after the delay the victory screen is shown
 	assert_true(victory_panel.visible, "The victory screen should appear after the delay")
 	# Check 6: the victory music is playing
@@ -93,3 +93,37 @@ func test_buying_all_items_shows_victory_screen_and_music() -> void: # Name star
 	assert_true(GameManager.tavern_music.stream_paused, "The tavern music should be paused on the victory screen")
 	# Check 8: the player has not pressed anything yet, so the victory is not marked as continued
 	assert_false(GameManager.victory_continued, "The victory should not be marked as continued before a button is pressed")
+
+
+# Keep Playing button
+## WHAT: opens the real tavern, shows the victory screen with its music, then presses the real "Keep Playing" button.
+## WHY: this button must close the victory screen, switch the music back to the tavern theme and remember the victory, otherwise the player loses progress or hears the wrong music.
+## PASSES when: the screen is hidden, the victory music stops, the tavern music plays again, the victory is marked as continued and saved in the file. FAILS when any of these does not happen.
+func test_keep_playing_button_closes_victory_screen_and_resumes_tavern_music() -> void: # Name starts with test_ so GUT runs it
+	GameManager.play_tavern_theme() # start the tavern music, like the game does
+	var tavern: Node = add_child_autoqfree(load("res://scenes/tavern.tscn").instantiate()) # the real tavern scene, placed into the test and removed after it
+	await wait_process_frames(2) # let the scene finish its _ready and its first frames
+	var victory_panel: Panel = tavern.get_node("%VictoryPanel") # % finds a node by its unique name: the victory screen
+	var button: Button = tavern.get_node("CanvasLayer/VictoryPanel/VictoryCard/ContinuePlayingButton") # the real button (the full path is needed, the gold milestone screen has a button with the same name)
+
+	GameManager.play_victory_theme() # the same call the game makes when the victory screen opens: it pauses the tavern music and plays the victory music
+	victory_panel.visible = true # show the victory screen, as if the player had just bought the last item
+
+	# Check 1: before the press the victory is not marked as continued
+	assert_false(GameManager.victory_continued, "The victory should not be marked as continued before the button is pressed")
+
+	button.pressed.emit() # press the button, like a click of the player
+
+	# Check 2: the victory screen is hidden after the press
+	assert_false(victory_panel.visible, "The victory screen should be hidden after pressing Keep Playing")
+	# Check 3: the victory music is stopped
+	assert_false(GameManager.victory_music.playing, "The victory music should stop after pressing Keep Playing")
+	# Check 4: the tavern music is playing again, not paused
+	assert_true(GameManager.tavern_music.playing and not GameManager.tavern_music.stream_paused, "The tavern music should play again after pressing Keep Playing") # "and not" = both must be true: it plays AND it is not paused
+	# Check 5: the victory is marked as continued
+	assert_true(GameManager.victory_continued, "The victory should be marked as continued after pressing Keep Playing")
+
+	var file_text: String = FileAccess.get_file_as_string(TEST_SAVE_PATH) # read the whole test save file as text
+	var saved: Dictionary = JSON.parse_string(file_text) # turn the JSON (JavaScript Object Notation) text into a dictionary
+	# Check 6: the continued victory is written into the save file
+	assert_true(saved.get("victory_continued", false), "victory_continued should be saved in the file") # get(key, default) gives false if the key is missing
