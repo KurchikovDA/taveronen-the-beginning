@@ -27,4 +27,9 @@ func _on_confirm_no_pressed() -> void:
 func _start_new_game() -> void:
 	# Wipe any existing progress, then show the intro story before the fresh tavern
 	GameManager.reset_game()
-	get_tree().change_scene_to_file("res://scenes/intro.tscn")
+	_go_to_intro() # Open the intro (the scene change lives in its own function below)
+
+# Opens the intro scene.
+# Kept as a separate function so a test can replace it: a real scene change would destroy the test runner.
+func _go_to_intro() -> void:
+	get_tree().change_scene_to_file("res://scenes/intro.tscn") # Swap the whole current scene for the intro
