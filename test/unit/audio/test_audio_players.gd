@@ -50,7 +50,7 @@ func test_music_players_use_music_bus() -> void: # Name starts with test_ so GUT
 
 
 # SFX bus
-## WHAT: checks that the SFX bus exists and that the four sound effect players send their sound to it: menu hover, sign letters, item appearing and coin.
+## WHAT: checks that the SFX (sound effects) bus exists and that the four sound effect players send their sound to it: menu hover, sign letters, item appearing and coin.
 ## WHY: the volume slider "Sound effects" changes the bus named SFX. A player on another bus would ignore the slider and stay loud.
 ## PASSES when: the SFX bus exists and all four players use it. FAILS when the bus is missing or any player uses another one.
 func test_sound_effect_players_use_sfx_bus() -> void: # Name starts with test_ so GUT runs it
