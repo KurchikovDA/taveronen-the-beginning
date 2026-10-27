@@ -1,10 +1,16 @@
 # Name of the workflow, it is shown in the Actions tab on GitHub
 name: GUT tests
 
-# When to run: on every push to any branch, and also by hand with a button
+# When to run: on every push to any branch, and also by hand with a button.
+# By hand you can also choose "publish": off = a dry run for itch.io (nothing is uploaded), on = a real upload (only from the main branch)
 on:
   push:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Really upload the builds to itch.io (leave it off for a safe dry run: nothing is uploaded)"
+        type: boolean
+        default: false
 
 # The job may write to the repository: it needs this to publish the Allure report to the gh-pages branch
 permissions:
@@ -69,7 +75,7 @@ jobs:
           publish_dir: allure-report
 
   build:
-    # Build the game for Windows and for the web. Nothing is published here, the files are only saved as artifacts (downloadable zip files).
+    # Build the game for Windows and for the web, test the web build, save the files as artifacts (downloadable zip files) and, at the end, upload them to itch.io.
     # needs: test = start only after the whole "test" job is green, so a broken game is never built.
     needs: test
     # Run only for a version tag (for example v1.0.5) or by hand with the "Run workflow" button
@@ -82,6 +88,16 @@ jobs:
       # Step 1: copy the project from the repository to the computer
       - name: Check out the repository
         uses: actions/checkout@v5
+
+      # Step 1b: for a version tag (for example v1.0.5) the game version in export_presets.cfg must be the same (1.0.5).
+      # If not, we stop at once, before spending minutes on the build. The tag text without the first "v" is compared with both version fields.
+      - name: Check the tag matches the game version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          for KEY in file_version product_version; do
+            grep -q "application/${KEY}=\"${TAG_VERSION}\"" export_presets.cfg || { echo "Tag ${GITHUB_REF_NAME} does not match application/${KEY} in export_presets.cfg"; exit 1; }
+          done
 
       # Step 2: download Godot (Linux build) and make it a "godot" command, same as in the test job
       - name: Install Godot
@@ -156,3 +172,29 @@ jobs:
           path: e2e-output
           if-no-files-found: ignore
           retention-days: 7
+
+      # Step 11: download butler (the itch.io upload tool) and make it a "butler" command.
+      # Only for the main branch or a version tag, so a test branch never gets near itch.io.
+      - name: Install butler
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        run: |
+          wget -q -O butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d butler-files
+          sudo mv butler-files/butler /usr/local/bin/butler
+          sudo chmod +x /usr/local/bin/butler
+          butler version
+
+      # Step 12: upload both builds to itch.io. This step runs only when every step above is green.
+      # BUTLER_API_KEY is the secret key from GitHub Secrets, butler reads it from this variable by itself.
+      # DRY_RUN_FLAG is "--dry-run" when the run was started by hand with "publish" off: butler only shows what it would upload.
+      # A version tag always uploads for real. The game version for itch.io is read from export_presets.cfg.
+      - name: Publish to itch.io
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          DRY_RUN_FLAG: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish && '--dry-run' || '' }}
+        run: |
+          VERSION=$(grep -oP 'application/product_version="\K[^"]+' export_presets.cfg)
+          echo "Game version: ${VERSION}, dry run flag: '${DRY_RUN_FLAG}'"
+          butler push ${DRY_RUN_FLAG} dist/windows voljulan/taveronen-the-beginning:windows --userversion "${VERSION}"
+          butler push ${DRY_RUN_FLAG} dist/web voljulan/taveronen-the-beginning:web --userversion "${VERSION}"
