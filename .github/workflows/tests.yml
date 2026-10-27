@@ -17,12 +17,12 @@ env:
 jobs:
   test:
     # GitHub gives us a clean Ubuntu (Linux) computer for each run
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # Step 1: copy the project from the repository to the computer
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Step 2: download Godot (Linux build) and make it a "godot" command
       - name: Install Godot
@@ -74,12 +74,12 @@ jobs:
     needs: test
     # Run only for a version tag (for example v1.0.5) or by hand with the "Run workflow" button
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # Step 1: copy the project from the repository to the computer
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Step 2: download Godot (Linux build) and make it a "godot" command, same as in the test job
       - name: Install Godot
@@ -121,7 +121,7 @@ jobs:
 
       # Step 7: save the Windows build as an artifact (a zip file you can download from the run page)
       - name: Upload the Windows build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: taveronen-windows
           path: dist/windows
@@ -130,7 +130,7 @@ jobs:
 
       # Step 8: save the Web build the same way
       - name: Upload the Web build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: taveronen-web
           path: dist/web
