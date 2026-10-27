@@ -16,9 +16,11 @@ on:
 permissions:
   contents: write
 
-# Godot version in one place, so it is easy to change later (both jobs use it)
+# Versions of the tools in one place, so they are easy to find and change (the jobs use them).
+# They are fixed on purpose: a new version of a tool must not break CI "by itself".
 env:
   GODOT_VERSION: "4.7.2"
+  BUTLER_VERSION: "15.32.0"
 
 jobs:
   test:
@@ -149,11 +151,13 @@ jobs:
 
       # Step 8: install the tools for the browser test (Python packages and the Chromium browser).
       # We use a virtual environment (.venv = a private folder for packages) so we do not touch the system Python.
+      # The packages and their exact versions are listed in test/e2e/requirements.txt (-r = read the list from this file).
+      # The Playwright version decides which Chromium is downloaded, so the browser is fixed too.
       # --with-deps also installs the system libraries that Chromium needs on Linux.
       - name: Install Playwright
         run: |
           python3 -m venv .venv
-          .venv/bin/python -m pip install pytest-playwright pillow
+          .venv/bin/python -m pip install -r test/e2e/requirements.txt
           .venv/bin/python -m playwright install --with-deps chromium
 
       # Step 9: run the web smoke test on the Web build we just exported.
@@ -174,11 +178,12 @@ jobs:
           retention-days: 7
 
       # Step 11: download butler (the itch.io upload tool) and make it a "butler" command.
+      # The version is fixed (BUTLER_VERSION at the top of this file) instead of LATEST, so a new butler cannot surprise us.
       # Only for the main branch or a version tag, so a test branch never gets near itch.io.
       - name: Install butler
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
         run: |
-          wget -q -O butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          wget -q -O butler.zip https://broth.itch.zone/butler/linux-amd64/${BUTLER_VERSION}/archive/default
           unzip -q butler.zip -d butler-files
           sudo mv butler-files/butler /usr/local/bin/butler
           sudo chmod +x /usr/local/bin/butler

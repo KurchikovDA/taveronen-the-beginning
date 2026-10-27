@@ -1,0 +1,7 @@
+# Python packages for the web smoke test (test_web_smoke.py).
+# The versions are fixed on purpose: a new version of a package must not break CI "by itself".
+# To update: change the numbers here, run the test on your computer, then push.
+pytest==9.1.1
+pytest-playwright==0.10.0
+playwright==1.64.1
+pillow==13.0.0
