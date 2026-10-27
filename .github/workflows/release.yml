@@ -1,0 +1,144 @@
+# Name of the workflow, it is shown in the Actions tab on GitHub.
+# The release: run the tests, build the game, test the web build, upload to itch.io.
+name: Build and release
+
+# When to run:
+# - when a version tag is pushed (for example v1.0.5): a real release
+# - by hand with the "Run workflow" button. There you can choose "publish": off = a dry run for itch.io (nothing is uploaded), on = a real upload (only from the main branch)
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Really upload the builds to itch.io (leave it off for a safe dry run: nothing is uploaded)"
+        type: boolean
+        default: false
+
+# The workflow may write to the repository. This must be given here, because tests.yml (called below) can never have more rights than the file that calls it:
+# tests.yml needs it to publish the Allure report to the gh-pages branch
+permissions:
+  contents: write
+
+# The version of butler (the itch.io upload tool), fixed on purpose: a new version must not break CI "by itself".
+# The Godot version is set in .github/actions/setup-godot/action.yml
+env:
+  BUTLER_VERSION: "15.32.0"
+
+jobs:
+  # The tests: we call tests.yml as a ready-made block, so the tests are written only once.
+  # If they fail, the "build" job below does not start.
+  test:
+    uses: ./.github/workflows/tests.yml
+
+  # Build the game for Windows and for the web, test the web build, save the files as artifacts (downloadable zip files) and, at the end, upload them to itch.io.
+  # needs: test = start only after the whole "test" job is green, so a broken game is never built.
+  build:
+    needs: test
+    runs-on: ubuntu-24.04
+    # Stop the job if it hangs for more than 20 minutes, so it does not burn the free minutes
+    timeout-minutes: 20
+
+    steps:
+      # Step 1: copy the project from the repository to the computer
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      # Step 1b: for a version tag (for example v1.0.5) the game version in export_presets.cfg must be the same (1.0.5).
+      # If not, we stop at once, before spending minutes on the build. The tag text without the first "v" is compared with both version fields.
+      - name: Check the tag matches the game version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          for KEY in file_version product_version; do
+            grep -q "application/${KEY}=\"${TAG_VERSION}\"" export_presets.cfg || { echo "Tag ${GITHUB_REF_NAME} does not match application/${KEY} in export_presets.cfg"; exit 1; }
+          done
+
+      # Step 2: install Godot, the export templates and import the project (the same action as in tests.yml, but with the templates)
+      # The Godot version is set in that action file, so it is not written here.
+      - name: Set up Godot
+        uses: ./.github/actions/setup-godot
+        with:
+          install-templates: "true"
+
+      # Step 3: export both builds into the dist folder (the path given here replaces the export path from the preset).
+      # mkdir -p creates the folders first, Godot does not create them. A failed export gives exit code 1 = red cross.
+      - name: Export Windows and Web
+        run: |
+          mkdir -p "dist/windows" "dist/web"
+          godot --headless --export-release "Windows Desktop" "dist/windows/Taveronen The Beginning.exe"
+          godot --headless --export-release "Web" "dist/web/index.html"
+          ls -la dist/windows dist/web
+
+      # Step 4: save the Windows build as an artifact (a zip file you can download from the run page)
+      - name: Upload the Windows build
+        uses: actions/upload-artifact@v6
+        with:
+          name: taveronen-windows
+          path: dist/windows
+          if-no-files-found: error
+          retention-days: 7
+
+      # Step 5: save the Web build the same way
+      - name: Upload the Web build
+        uses: actions/upload-artifact@v6
+        with:
+          name: taveronen-web
+          path: dist/web
+          if-no-files-found: error
+          retention-days: 7
+
+      # Step 6: install the tools for the browser test (Python packages and the Chromium browser).
+      # We use a virtual environment (.venv = a private folder for packages) so we do not touch the system Python.
+      # The packages and their exact versions are listed in test/e2e/requirements.txt (-r = read the list from this file).
+      # The Playwright version decides which Chromium is downloaded, so the browser is fixed too.
+      # --with-deps also installs the system libraries that Chromium needs on Linux.
+      - name: Install Playwright
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install -r test/e2e/requirements.txt
+          .venv/bin/python -m playwright install --with-deps chromium
+
+      # Step 7: run the web smoke test on the Web build we just exported.
+      # The test looks for the build in dist/web by default, so no settings are needed here.
+      # A failed check gives exit code 1 = red cross.
+      - name: Run web smoke test
+        run: .venv/bin/python -m pytest test/e2e
+
+      # Step 8: save the screenshots made by the test, so you can look at them from the run page.
+      # "if: always()" = do it even when the test failed, because the pictures help most when something is wrong
+      - name: Upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-screenshots
+          path: e2e-output
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # Step 9: download butler (the itch.io upload tool) and make it a "butler" command.
+      # The version is fixed (BUTLER_VERSION at the top of this file) instead of LATEST, so a new butler cannot surprise us.
+      # Only for the main branch or a version tag, so a test branch never gets near itch.io.
+      - name: Install butler
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        run: |
+          wget -q -O butler.zip https://broth.itch.zone/butler/linux-amd64/${BUTLER_VERSION}/archive/default
+          unzip -q butler.zip -d butler-files
+          sudo mv butler-files/butler /usr/local/bin/butler
+          sudo chmod +x /usr/local/bin/butler
+          butler version
+
+      # Step 10: upload both builds to itch.io. This step runs only when every step above is green.
+      # BUTLER_API_KEY is the secret key from GitHub Secrets, butler reads it from this variable by itself.
+      # DRY_RUN_FLAG is "--dry-run" when the run was started by hand with "publish" off: butler only shows what it would upload.
+      # A version tag always uploads for real. The game version for itch.io is read from export_presets.cfg.
+      - name: Publish to itch.io
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          DRY_RUN_FLAG: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish && '--dry-run' || '' }}
+        run: |
+          VERSION=$(grep -oP 'application/product_version="\K[^"]+' export_presets.cfg)
+          echo "Game version: ${VERSION}, dry run flag: '${DRY_RUN_FLAG}'"
+          butler push ${DRY_RUN_FLAG} dist/windows voljulan/taveronen-the-beginning:windows --userversion "${VERSION}"
+          butler push ${DRY_RUN_FLAG} dist/web voljulan/taveronen-the-beginning:web --userversion "${VERSION}"

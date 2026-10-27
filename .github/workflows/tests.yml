@@ -1,26 +1,18 @@
-# Name of the workflow, it is shown in the Actions tab on GitHub
-name: GUT tests
+# Name of the workflow, it is shown in the Actions tab on GitHub.
+# This file only runs the tests. The release (build + upload to itch.io) lives in release.yml and calls this file first.
+name: Tests
 
-# When to run: on every push to any branch, and also by hand with a button.
-# By hand you can also choose "publish": off = a dry run for itch.io (nothing is uploaded), on = a real upload (only from the main branch)
+# When to run:
+# - on every push to any branch (branches: ["**"] = all branches; pushing a version tag is NOT included, the tag starts release.yml instead)
+# - when another workflow calls it (workflow_call = "this file can be used as a ready-made block"; release.yml does it)
 on:
   push:
-  workflow_dispatch:
-    inputs:
-      publish:
-        description: "Really upload the builds to itch.io (leave it off for a safe dry run: nothing is uploaded)"
-        type: boolean
-        default: false
+    branches: ["**"]
+  workflow_call:
 
 # The job may write to the repository: it needs this to publish the Allure report to the gh-pages branch
 permissions:
   contents: write
-
-# Versions of the tools in one place, so they are easy to find and change (the jobs use them).
-# They are fixed on purpose: a new version of a tool must not break CI "by itself".
-env:
-  GODOT_VERSION: "4.7.2"
-  BUTLER_VERSION: "15.32.0"
 
 jobs:
   test:
@@ -33,11 +25,10 @@ jobs:
         uses: actions/checkout@v5
 
       # Step 2: install Godot and import the project (the steps live in .github/actions/setup-godot/action.yml,
-      # the build job uses the same ones). This works only after the checkout, because the action is a file of the repository.
+      # release.yml uses the same ones). This works only after the checkout, because the action is a file of the repository.
+      # The Godot version is set in that action file, so it is not written here.
       - name: Set up Godot
         uses: ./.github/actions/setup-godot
-        with:
-          godot-version: ${{ env.GODOT_VERSION }}
 
       # Step 3: run all tests without a window. Which folders to scan is set in .gutconfig.json.
       # -gexit closes Godot after the run; failed tests make this step fail (red cross).
@@ -69,117 +60,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: allure-report
-
-  build:
-    # Build the game for Windows and for the web, test the web build, save the files as artifacts (downloadable zip files) and, at the end, upload them to itch.io.
-    # needs: test = start only after the whole "test" job is green, so a broken game is never built.
-    needs: test
-    # Run only for a version tag (for example v1.0.5) or by hand with the "Run workflow" button
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
-    # Stop the job if it hangs for more than 20 minutes, so it does not burn the free minutes
-    timeout-minutes: 20
-
-    steps:
-      # Step 1: copy the project from the repository to the computer
-      - name: Check out the repository
-        uses: actions/checkout@v5
-
-      # Step 1b: for a version tag (for example v1.0.5) the game version in export_presets.cfg must be the same (1.0.5).
-      # If not, we stop at once, before spending minutes on the build. The tag text without the first "v" is compared with both version fields.
-      - name: Check the tag matches the game version
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          for KEY in file_version product_version; do
-            grep -q "application/${KEY}=\"${TAG_VERSION}\"" export_presets.cfg || { echo "Tag ${GITHUB_REF_NAME} does not match application/${KEY} in export_presets.cfg"; exit 1; }
-          done
-
-      # Step 2: install Godot, the export templates and import the project (same action as in the test job, but with templates)
-      - name: Set up Godot
-        uses: ./.github/actions/setup-godot
-        with:
-          godot-version: ${{ env.GODOT_VERSION }}
-          install-templates: "true"
-
-      # Step 3: export both builds into the dist folder (the path given here replaces the export path from the preset).
-      # mkdir -p creates the folders first, Godot does not create them. A failed export gives exit code 1 = red cross.
-      - name: Export Windows and Web
-        run: |
-          mkdir -p "dist/windows" "dist/web"
-          godot --headless --export-release "Windows Desktop" "dist/windows/Taveronen The Beginning.exe"
-          godot --headless --export-release "Web" "dist/web/index.html"
-          ls -la dist/windows dist/web
-
-      # Step 4: save the Windows build as an artifact (a zip file you can download from the run page)
-      - name: Upload the Windows build
-        uses: actions/upload-artifact@v6
-        with:
-          name: taveronen-windows
-          path: dist/windows
-          if-no-files-found: error
-          retention-days: 7
-
-      # Step 5: save the Web build the same way
-      - name: Upload the Web build
-        uses: actions/upload-artifact@v6
-        with:
-          name: taveronen-web
-          path: dist/web
-          if-no-files-found: error
-          retention-days: 7
-
-      # Step 6: install the tools for the browser test (Python packages and the Chromium browser).
-      # We use a virtual environment (.venv = a private folder for packages) so we do not touch the system Python.
-      # The packages and their exact versions are listed in test/e2e/requirements.txt (-r = read the list from this file).
-      # The Playwright version decides which Chromium is downloaded, so the browser is fixed too.
-      # --with-deps also installs the system libraries that Chromium needs on Linux.
-      - name: Install Playwright
-        run: |
-          python3 -m venv .venv
-          .venv/bin/python -m pip install -r test/e2e/requirements.txt
-          .venv/bin/python -m playwright install --with-deps chromium
-
-      # Step 7: run the web smoke test on the Web build we just exported.
-      # The test looks for the build in dist/web by default, so no settings are needed here.
-      # A failed check gives exit code 1 = red cross.
-      - name: Run web smoke test
-        run: .venv/bin/python -m pytest test/e2e
-
-      # Step 8: save the screenshots made by the test, so you can look at them from the run page.
-      # "if: always()" = do it even when the test failed, because the pictures help most when something is wrong
-      - name: Upload the screenshots
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: e2e-screenshots
-          path: e2e-output
-          if-no-files-found: ignore
-          retention-days: 7
-
-      # Step 9: download butler (the itch.io upload tool) and make it a "butler" command.
-      # The version is fixed (BUTLER_VERSION at the top of this file) instead of LATEST, so a new butler cannot surprise us.
-      # Only for the main branch or a version tag, so a test branch never gets near itch.io.
-      - name: Install butler
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-        run: |
-          wget -q -O butler.zip https://broth.itch.zone/butler/linux-amd64/${BUTLER_VERSION}/archive/default
-          unzip -q butler.zip -d butler-files
-          sudo mv butler-files/butler /usr/local/bin/butler
-          sudo chmod +x /usr/local/bin/butler
-          butler version
-
-      # Step 10: upload both builds to itch.io. This step runs only when every step above is green.
-      # BUTLER_API_KEY is the secret key from GitHub Secrets, butler reads it from this variable by itself.
-      # DRY_RUN_FLAG is "--dry-run" when the run was started by hand with "publish" off: butler only shows what it would upload.
-      # A version tag always uploads for real. The game version for itch.io is read from export_presets.cfg.
-      - name: Publish to itch.io
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
-        env:
-          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-          DRY_RUN_FLAG: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish && '--dry-run' || '' }}
-        run: |
-          VERSION=$(grep -oP 'application/product_version="\K[^"]+' export_presets.cfg)
-          echo "Game version: ${VERSION}, dry run flag: '${DRY_RUN_FLAG}'"
-          butler push ${DRY_RUN_FLAG} dist/windows voljulan/taveronen-the-beginning:windows --userversion "${VERSION}"
-          butler push ${DRY_RUN_FLAG} dist/web voljulan/taveronen-the-beginning:web --userversion "${VERSION}"

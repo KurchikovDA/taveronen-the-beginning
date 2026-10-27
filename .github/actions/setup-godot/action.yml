@@ -1,4 +1,4 @@
-# A composite action = a small reusable block of steps that both jobs (test and build) can call with one line.
+# A composite action = a small reusable block of steps that both workflows (tests.yml and release.yml) can call with one line.
 # Without it the same "install Godot" steps would be written twice and could drift apart.
 name: Set up Godot
 description: Installs Godot, optionally the export templates, and imports the project
@@ -6,10 +6,11 @@ description: Installs Godot, optionally the export templates, and imports the pr
 # The settings the caller can pass in (the "with:" block of the step that calls this action)
 inputs:
   godot-version:
-    description: "The Godot version, for example 4.7.2"
-    required: true
+    description: "The Godot version. This default is the ONLY place in the repository where the version is written, change it here"
+    required: false
+    default: "4.7.2"
   install-templates:
-    description: "Install the export templates too ('true' or 'false'); only the build job needs them"
+    description: "Install the export templates too ('true' or 'false'); only the release build needs them"
     required: false
     default: "false"
 
