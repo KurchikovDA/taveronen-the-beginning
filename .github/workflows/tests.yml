@@ -32,20 +32,14 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v5
 
-      # Step 2: download Godot (Linux build) and make it a "godot" command
-      - name: Install Godot
-        run: |
-          wget -q https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
-          unzip -q Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
-          sudo mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
-          sudo chmod +x /usr/local/bin/godot
+      # Step 2: install Godot and import the project (the steps live in .github/actions/setup-godot/action.yml,
+      # the build job uses the same ones). This works only after the checkout, because the action is a file of the repository.
+      - name: Set up Godot
+        uses: ./.github/actions/setup-godot
+        with:
+          godot-version: ${{ env.GODOT_VERSION }}
 
-      # Step 3: the .godot folder is not in the repository, so import the project
-      # once to build it. "|| true" means: do not fail if Godot exits with a warning
-      - name: Import the project
-        run: godot --headless --import || true
-
-      # Step 4: run all tests without a window. Which folders to scan is set in .gutconfig.json.
+      # Step 3: run all tests without a window. Which folders to scan is set in .gutconfig.json.
       # -gexit closes Godot after the run; failed tests make this step fail (red cross).
       # -gjunit_xml_file makes GUT save the results as a JUnit XML (extensible markup language) file for Allure
       - name: Run GUT tests
@@ -53,20 +47,20 @@ jobs:
           mkdir -p allure-results
           godot --headless -s addons/gut/gut_cmdln.gd -gexit -gjunit_xml_file=res://allure-results/junit.xml
 
-      # Step 5: the smoke test. It presses the buttons that change the scene and checks that the right scene opens.
+      # Step 4: the smoke test. It presses the buttons that change the scene and checks that the right scene opens.
       # "if: always()" = run it even when GUT failed, so one red step does not hide the other one.
       # The test ends with exit code 1 if any check failed, and that makes this step fail (red cross).
       - name: Run smoke test
         if: always()
         run: godot --headless -s res://test/smoke/smoke_scene_changes.gd
 
-      # Step 6: turn the XML file into an Allure HTML report.
+      # Step 5: turn the XML file into an Allure HTML report.
       # "if: always()" = do it even when some tests failed, so the report shows the failures
       - name: Build Allure report
         if: always()
         run: npx --yes allure@3.22.1 generate allure-results -o allure-report
 
-      # Step 7: publish the report to the gh-pages branch (GitHub Pages shows it as a website).
+      # Step 6: publish the report to the gh-pages branch (GitHub Pages shows it as a website).
       # Only for the main branch, so a broken test branch does not replace the public report
       - name: Publish Allure report
         if: always() && github.ref == 'refs/heads/main'
@@ -101,28 +95,14 @@ jobs:
             grep -q "application/${KEY}=\"${TAG_VERSION}\"" export_presets.cfg || { echo "Tag ${GITHUB_REF_NAME} does not match application/${KEY} in export_presets.cfg"; exit 1; }
           done
 
-      # Step 2: download Godot (Linux build) and make it a "godot" command, same as in the test job
-      - name: Install Godot
-        run: |
-          wget -q https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
-          unzip -q Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
-          sudo mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
-          sudo chmod +x /usr/local/bin/godot
+      # Step 2: install Godot, the export templates and import the project (same action as in the test job, but with templates)
+      - name: Set up Godot
+        uses: ./.github/actions/setup-godot
+        with:
+          godot-version: ${{ env.GODOT_VERSION }}
+          install-templates: "true"
 
-      # Step 3: download the export templates (the ready game "engines" that Godot puts into a build).
-      # We take only the 4 files we need, not the whole 1.3 GB archive. mkdir -p first: unzip cannot create a nested folder.
-      # The folder name must be exactly the Godot version + ".stable", otherwise Godot does not find the templates.
-      - name: Install export templates
-        run: |
-          wget -q https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
-          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-          unzip -q -j Godot_v${GODOT_VERSION}-stable_export_templates.tpz "templates/version.txt" "templates/web_nothreads_release.zip" "templates/windows_release_x86_64.exe" "templates/windows_release_x86_64_console.exe" -d ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-
-      # Step 4: import the project once, to build the .godot folder (same as in the test job)
-      - name: Import the project
-        run: godot --headless --import || true
-
-      # Step 5: export both builds into the dist folder (the path given here replaces the export path from the preset).
+      # Step 3: export both builds into the dist folder (the path given here replaces the export path from the preset).
       # mkdir -p creates the folders first, Godot does not create them. A failed export gives exit code 1 = red cross.
       - name: Export Windows and Web
         run: |
@@ -131,7 +111,7 @@ jobs:
           godot --headless --export-release "Web" "dist/web/index.html"
           ls -la dist/windows dist/web
 
-      # Step 6: save the Windows build as an artifact (a zip file you can download from the run page)
+      # Step 4: save the Windows build as an artifact (a zip file you can download from the run page)
       - name: Upload the Windows build
         uses: actions/upload-artifact@v6
         with:
@@ -140,7 +120,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      # Step 7: save the Web build the same way
+      # Step 5: save the Web build the same way
       - name: Upload the Web build
         uses: actions/upload-artifact@v6
         with:
@@ -149,7 +129,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      # Step 8: install the tools for the browser test (Python packages and the Chromium browser).
+      # Step 6: install the tools for the browser test (Python packages and the Chromium browser).
       # We use a virtual environment (.venv = a private folder for packages) so we do not touch the system Python.
       # The packages and their exact versions are listed in test/e2e/requirements.txt (-r = read the list from this file).
       # The Playwright version decides which Chromium is downloaded, so the browser is fixed too.
@@ -160,13 +140,13 @@ jobs:
           .venv/bin/python -m pip install -r test/e2e/requirements.txt
           .venv/bin/python -m playwright install --with-deps chromium
 
-      # Step 9: run the web smoke test on the Web build we just exported.
+      # Step 7: run the web smoke test on the Web build we just exported.
       # The test looks for the build in dist/web by default, so no settings are needed here.
       # A failed check gives exit code 1 = red cross.
       - name: Run web smoke test
         run: .venv/bin/python -m pytest test/e2e
 
-      # Step 10: save the screenshots made by the test, so you can look at them from the run page.
+      # Step 8: save the screenshots made by the test, so you can look at them from the run page.
       # "if: always()" = do it even when the test failed, because the pictures help most when something is wrong
       - name: Upload the screenshots
         if: always()
@@ -177,7 +157,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # Step 11: download butler (the itch.io upload tool) and make it a "butler" command.
+      # Step 9: download butler (the itch.io upload tool) and make it a "butler" command.
       # The version is fixed (BUTLER_VERSION at the top of this file) instead of LATEST, so a new butler cannot surprise us.
       # Only for the main branch or a version tag, so a test branch never gets near itch.io.
       - name: Install butler
@@ -189,7 +169,7 @@ jobs:
           sudo chmod +x /usr/local/bin/butler
           butler version
 
-      # Step 12: upload both builds to itch.io. This step runs only when every step above is green.
+      # Step 10: upload both builds to itch.io. This step runs only when every step above is green.
       # BUTLER_API_KEY is the secret key from GitHub Secrets, butler reads it from this variable by itself.
       # DRY_RUN_FLAG is "--dry-run" when the run was started by hand with "publish" off: butler only shows what it would upload.
       # A version tag always uploads for real. The game version for itch.io is read from export_presets.cfg.
