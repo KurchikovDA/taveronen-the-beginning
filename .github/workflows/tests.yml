@@ -102,15 +102,7 @@ jobs:
       - name: Import the project
         run: godot --headless --import || true
 
-      # Step 5: the Windows icon is saved in export_presets.cfg as a UID (a hidden id) that exists only on the computer where it was chosen.
-      # A clean copy from GitHub does not know it, and the exe would get the standard Godot icon without any error.
-      # So we replace the id with the plain path of the icon file, and the next line fails the step if the replace did not happen.
-      - name: Use the icon by path
-        run: |
-          sed -i 's#application/icon="uid://[a-z0-9]*"#application/icon="res://tavern.ico"#' export_presets.cfg
-          grep -q 'application/icon="res://tavern.ico"' export_presets.cfg
-
-      # Step 6: export both builds into the dist folder (the path given here replaces the export path from the preset).
+      # Step 5: export both builds into the dist folder (the path given here replaces the export path from the preset).
       # mkdir -p creates the folders first, Godot does not create them. A failed export gives exit code 1 = red cross.
       - name: Export Windows and Web
         run: |
@@ -119,7 +111,7 @@ jobs:
           godot --headless --export-release "Web" "dist/web/index.html"
           ls -la dist/windows dist/web
 
-      # Step 7: save the Windows build as an artifact (a zip file you can download from the run page)
+      # Step 6: save the Windows build as an artifact (a zip file you can download from the run page)
       - name: Upload the Windows build
         uses: actions/upload-artifact@v6
         with:
@@ -128,7 +120,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      # Step 8: save the Web build the same way
+      # Step 7: save the Web build the same way
       - name: Upload the Web build
         uses: actions/upload-artifact@v6
         with:
