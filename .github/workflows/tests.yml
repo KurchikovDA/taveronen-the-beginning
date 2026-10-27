@@ -75,6 +75,8 @@ jobs:
     # Run only for a version tag (for example v1.0.5) or by hand with the "Run workflow" button
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
+    # Stop the job if it hangs for more than 20 minutes, so it does not burn the free minutes
+    timeout-minutes: 20
 
     steps:
       # Step 1: copy the project from the repository to the computer
@@ -127,4 +129,30 @@ jobs:
           name: taveronen-web
           path: dist/web
           if-no-files-found: error
+          retention-days: 7
+
+      # Step 8: install the tools for the browser test (Python packages and the Chromium browser).
+      # We use a virtual environment (.venv = a private folder for packages) so we do not touch the system Python.
+      # --with-deps also installs the system libraries that Chromium needs on Linux.
+      - name: Install Playwright
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install pytest-playwright pillow
+          .venv/bin/python -m playwright install --with-deps chromium
+
+      # Step 9: run the web smoke test on the Web build we just exported.
+      # The test looks for the build in dist/web by default, so no settings are needed here.
+      # A failed check gives exit code 1 = red cross.
+      - name: Run web smoke test
+        run: .venv/bin/python -m pytest test/e2e
+
+      # Step 10: save the screenshots made by the test, so you can look at them from the run page.
+      # "if: always()" = do it even when the test failed, because the pictures help most when something is wrong
+      - name: Upload the screenshots
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-screenshots
+          path: e2e-output
+          if-no-files-found: ignore
           retention-days: 7
