@@ -45,13 +45,20 @@ jobs:
           mkdir -p allure-results
           godot --headless -s addons/gut/gut_cmdln.gd -gexit -gjunit_xml_file=res://allure-results/junit.xml
 
-      # Step 5: turn the XML file into an Allure HTML report.
+      # Step 5: the smoke test. It presses the buttons that change the scene and checks that the right scene opens.
+      # "if: always()" = run it even when GUT failed, so one red step does not hide the other one.
+      # The test ends with exit code 1 if any check failed, and that makes this step fail (red cross).
+      - name: Run smoke test
+        if: always()
+        run: godot --headless -s res://test/smoke/smoke_scene_changes.gd
+
+      # Step 6: turn the XML file into an Allure HTML report.
       # "if: always()" = do it even when some tests failed, so the report shows the failures
       - name: Build Allure report
         if: always()
         run: npx --yes allure@3.22.1 generate allure-results -o allure-report
 
-      # Step 6: publish the report to the gh-pages branch (GitHub Pages shows it as a website).
+      # Step 7: publish the report to the gh-pages branch (GitHub Pages shows it as a website).
       # Only for the main branch, so a broken test branch does not replace the public report
       - name: Publish Allure report
         if: always() && github.ref == 'refs/heads/main'
