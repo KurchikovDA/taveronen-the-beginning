@@ -6,3 +6,7 @@
 __pycache__/
 .pytest_cache/
 e2e-output/
+
+# Allure report folders (CI makes them, so they must never get into the repository)
+allure-results/
+allure-report/

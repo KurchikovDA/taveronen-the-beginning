@@ -4,7 +4,7 @@ name: Build and release
 
 # When to run:
 # - when a version tag is pushed (for example v1.0.5): a real release
-# - by hand with the "Run workflow" button. There you can choose "publish": off = a dry run for itch.io (nothing is uploaded), on = a real upload (only from the main branch)
+# - by hand with the "Run workflow" button. There you can choose "publish": off = a dry run for itch.io (nothing is uploaded), on = a real upload (only from the main branch or a version tag)
 on:
   push:
     tags: ["v*"]
