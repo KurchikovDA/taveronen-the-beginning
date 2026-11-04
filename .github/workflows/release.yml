@@ -42,7 +42,7 @@ jobs:
     steps:
       # Step 1: copy the project from the repository to the computer
       - name: Check out the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Step 1b: for a version tag (for example v1.0.5) the game version in export_presets.cfg must be the same (1.0.5).
       # If not, we stop at once, before spending minutes on the build. The tag text without the first "v" is compared with both version fields.
