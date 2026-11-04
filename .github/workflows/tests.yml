@@ -22,7 +22,7 @@ jobs:
     steps:
       # Step 1: copy the project from the repository to the computer
       - name: Check out the repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Step 2: install Godot and import the project (the steps live in .github/actions/setup-godot/action.yml,
       # release.yml uses the same ones). This works only after the checkout, because the action is a file of the repository.
