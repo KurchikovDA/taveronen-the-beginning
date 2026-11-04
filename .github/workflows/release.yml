@@ -44,8 +44,8 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v7
 
-      # Step 1b: for a version tag (for example v1.0.5) the game version in export_presets.cfg must be the same (1.0.5).
-      # If not, we stop at once, before spending minutes on the build. The tag text without the first "v" is compared with both version fields.
+      # Step 1b: for a version tag (for example v1.0.5) the game version in export_presets.cfg and in project.godot must be the same (1.0.5).
+      # If not, we stop at once, before spending minutes on the build. The tag text without the first "v" is compared with both version fields and with config/version.
       - name: Check the tag matches the game version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
@@ -53,6 +53,7 @@ jobs:
           for KEY in file_version product_version; do
             grep -q "application/${KEY}=\"${TAG_VERSION}\"" export_presets.cfg || { echo "Tag ${GITHUB_REF_NAME} does not match application/${KEY} in export_presets.cfg"; exit 1; }
           done
+          grep -q "^config/version=\"${TAG_VERSION}\"" project.godot || { echo "Tag ${GITHUB_REF_NAME} does not match config/version in project.godot"; exit 1; }
 
       # Step 2: install Godot, the export templates and import the project (the same action as in tests.yml, but with the templates)
       # The Godot version is set in that action file, so it is not written here.
