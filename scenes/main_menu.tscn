@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://dt5lvnen14ka4" path="res://scripts/ui/translated_rich_text.gd" id="10_gw5y6"]
 [ext_resource type="Script" uid="uid://c0the6ojnwfhp" path="res://scripts/ui/back_button.gd" id="11_svtp6"]
 [ext_resource type="PackedScene" uid="uid://dp1twep228bcd" path="res://scenes/settings_panel.tscn" id="12_1dfpl"]
+[ext_resource type="Script" uid="uid://dr8miclyk80nl" path="res://scripts/ui/version_label.gd" id="15_7b55j"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_flqon"]
 shader = ExtResource("1_rcqid")
@@ -562,3 +563,19 @@ clip_text = true
 [node name="SettingsPanel" parent="." unique_id=1446897405 instance=ExtResource("12_1dfpl")]
 unique_name_in_owner = true
 layout_mode = 1
+
+[node name="VersionLabel" type="Label" parent="." unique_id=181177414]
+layout_mode = 0
+offset_left = 898.0
+offset_top = 614.0
+offset_right = 1142.0
+offset_bottom = 638.0
+theme = ExtResource("2_rcqid")
+theme_override_colors/font_color = Color(0.7058824, 0.7058824, 0.7058824, 0.6)
+theme_override_fonts/font = ExtResource("4_1ajci")
+theme_override_font_sizes/font_size = 12
+text = "v1.0.0"
+horizontal_alignment = 2
+vertical_alignment = 2
+script = ExtResource("15_7b55j")
+metadata/autofit_max_size = 12
