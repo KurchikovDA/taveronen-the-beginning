@@ -63,7 +63,7 @@ func test_shop_prices_add_up_to_30_minutes() -> void: # Name starts with test_ s
 		total_price += item["price"] # Add the price of this item to the counter. It is the same as: total_price = total_price + price
 
 	# Check 1: all prices together cost exactly 1800 gold (30 minutes at 1 gold per second)
-	assert_eq(total_price, 1801, "All prices together should be 1800 gold (30 minutes at 1 gold per second)") # Actual value first, expected second
+	assert_eq(total_price, 1800, "All prices together should be 1800 gold (30 minutes at 1 gold per second)") # Actual value first, expected second
 
 
 # Item fields
