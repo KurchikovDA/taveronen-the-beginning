@@ -1,0 +1,14 @@
+# Dependabot config. Dependabot is a GitHub bot that checks the versions of our tools and opens a pull request (PR) when a newer one is released.
+# "version: 2" is the only format GitHub supports today, it must be written exactly like this.
+version: 2
+
+updates:
+  # We watch GitHub Actions: the ready-made blocks we use in the workflow files (checkout, upload-artifact and so on)
+  - package-ecosystem: "github-actions"
+    # "/" = look in the standard place: the .github/workflows folder and the composite action files
+    directory: "/"
+    # How often to check for new versions: once a month, because the project is closed and rarely changes
+    schedule:
+      interval: "monthly"
+    # At most 3 open PRs at the same time, so the PR list does not fill up
+    open-pull-requests-limit: 3
