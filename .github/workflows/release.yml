@@ -72,7 +72,7 @@ jobs:
 
       # Step 4: save the Windows build as an artifact (a zip file you can download from the run page)
       - name: Upload the Windows build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: taveronen-windows
           path: dist/windows
@@ -81,7 +81,7 @@ jobs:
 
       # Step 5: save the Web build the same way
       - name: Upload the Web build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: taveronen-web
           path: dist/web
@@ -109,7 +109,7 @@ jobs:
       # "if: always()" = do it even when the test failed, because the pictures help most when something is wrong
       - name: Upload the screenshots
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-screenshots
           path: e2e-output
