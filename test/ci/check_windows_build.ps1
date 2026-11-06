@@ -8,7 +8,7 @@ param(
 
 $MaxWaitSeconds = 60 # how long we wait for the game to finish, after that we stop it by force
 $QuitAfterFrames = 300 # the game closes itself after this many frames
-$MainSceneMarker = "Completed load for: 'res://scenes/main_menu.tscn'" # this log line appears when the main menu is loaded
+$MainSceneMarker = "Completed load for: 'res://scenes/no_such_scene.tscn'" # this log line appears when the main menu is loaded
 $FailureLines = @() # here we collect the reasons why the check failed, an empty list at the end means success
 
 $BuildDir = (Resolve-Path $BuildDir).Path # turn the folder into a full path, so Godot finds the log file from any place
