@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Taveronen: The Beginning"
-config/version="1.0.7"
+config/version="1.0.8"
 run/main_scene="uid://0ir0aje114ju"
 config/features=PackedStringArray("4.7", "Forward Plus")
 boot_splash/bg_color=Color(0.06666667, 0.03137255, 0.019607844, 1)
