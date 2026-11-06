@@ -1,5 +1,5 @@
 # Name of the workflow, it is shown in the Actions tab on GitHub.
-# The release: run the tests, build the game, test the web build, upload to itch.io.
+# The release: run the tests, build the game, test the web build, check the Windows build, upload to itch.io.
 name: Build and release
 
 # When to run:
@@ -31,7 +31,8 @@ jobs:
   test:
     uses: ./.github/workflows/tests.yml
 
-  # Build the game for Windows and for the web, test the web build, save the files as artifacts (downloadable zip files) and, at the end, upload them to itch.io.
+  # Build the game for Windows and for the web, test the web build and save the files as artifacts (downloadable zip files).
+  # The upload to itch.io is done by the "publish" job at the end, after the Windows check.
   # needs: test = start only after the whole "test" job is green, so a broken game is never built.
   build:
     needs: test
@@ -117,11 +118,60 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # Step 9: download butler (the itch.io upload tool) and make it a "butler" command.
+  # Check the Windows build on a real Windows computer: start the real .exe and read its log.
+  # needs: build = start only after the build job is green, the .exe comes from its artifact.
+  windows-check:
+    needs: build
+    runs-on: windows-2025 # a Windows computer from GitHub, the version is fixed like all other tools
+    timeout-minutes: 10 # stop the job if it hangs, so it does not burn the free minutes
+
+    steps:
+      # Step 1: copy the project to the computer, we need the check script from it
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      # Step 2: download the Windows build that the build job saved as an artifact
+      - name: Download the Windows build
+        uses: actions/download-artifact@v8
+        with:
+          name: taveronen-windows # the same name as in the upload step of the build job
+          path: windows-build # the folder where the files will lie
+
+      # Step 3: run the check script. A failed check gives exit code 1 = red cross.
+      - name: Check the Windows build
+        shell: pwsh
+        run: ./test/ci/check_windows_build.ps1 -BuildDir windows-build
+
+  # Upload both builds to itch.io. It starts only when BOTH the build and the Windows check are green,
+  # so a build that does not start on Windows never reaches the players.
+  # The "if" line: only for the main branch or a version tag, so a test branch never gets near itch.io.
+  publish:
+    needs: [build, windows-check]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10 # stop the job if it hangs, so it does not burn the free minutes
+
+    steps:
+      # Step 1: copy the project to the computer, we need export_presets.cfg to read the game version
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      # Step 2: download both builds that the build job saved as artifacts, into the same folders as before
+      - name: Download the Windows build
+        uses: actions/download-artifact@v8
+        with:
+          name: taveronen-windows
+          path: dist/windows
+
+      - name: Download the Web build
+        uses: actions/download-artifact@v8
+        with:
+          name: taveronen-web
+          path: dist/web
+
+      # Step 3: download butler (the itch.io upload tool) and make it a "butler" command.
       # The version is fixed (BUTLER_VERSION at the top of this file) instead of LATEST, so a new butler cannot surprise us.
-      # Only for the main branch or a version tag, so a test branch never gets near itch.io.
       - name: Install butler
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
         run: |
           wget -q -O butler.zip https://broth.itch.zone/butler/linux-amd64/${BUTLER_VERSION}/archive/default
           unzip -q butler.zip -d butler-files
@@ -129,12 +179,11 @@ jobs:
           sudo chmod +x /usr/local/bin/butler
           butler version
 
-      # Step 10: upload both builds to itch.io. This step runs only when every step above is green.
+      # Step 4: upload both builds to itch.io.
       # BUTLER_API_KEY is the secret key from GitHub Secrets, butler reads it from this variable by itself.
       # DRY_RUN_FLAG is "--dry-run" when the run was started by hand with "publish" off: butler only shows what it would upload.
       # A version tag always uploads for real. The game version for itch.io is read from export_presets.cfg.
       - name: Publish to itch.io
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           DRY_RUN_FLAG: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish && '--dry-run' || '' }}
