@@ -1,5 +1,5 @@
 # Name of the workflow, it is shown in the Actions tab on GitHub.
-# The release: run the tests, build the game, test the web build, upload to itch.io.
+# The release: run the tests, build the game, test the web build, check the Windows build, upload to itch.io.
 name: Build and release
 
 # When to run:
@@ -143,3 +143,27 @@ jobs:
           echo "Game version: ${VERSION}, dry run flag: '${DRY_RUN_FLAG}'"
           butler push ${DRY_RUN_FLAG} dist/windows voljulan/taveronen-the-beginning:windows --userversion "${VERSION}"
           butler push ${DRY_RUN_FLAG} dist/web voljulan/taveronen-the-beginning:web --userversion "${VERSION}"
+
+  # Check the Windows build on a real Windows computer: start the real .exe and read its log.
+  # needs: build = start only after the build job is green, the .exe comes from its artifact.
+  windows-check:
+    needs: build
+    runs-on: windows-2025 # a Windows computer from GitHub, the version is fixed like all other tools
+    timeout-minutes: 10 # stop the job if it hangs, so it does not burn the free minutes
+
+    steps:
+      # Step 1: copy the project to the computer, we need the check script from it
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      # Step 2: download the Windows build that the build job saved as an artifact
+      - name: Download the Windows build
+        uses: actions/download-artifact@v8
+        with:
+          name: taveronen-windows # the same name as in the upload step of the build job
+          path: windows-build # the folder where the files will lie
+
+      # Step 3: run the check script. A failed check gives exit code 1 = red cross.
+      - name: Check the Windows build
+        shell: pwsh
+        run: ./test/ci/check_windows_build.ps1 -BuildDir windows-build
