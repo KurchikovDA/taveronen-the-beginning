@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/KurchikovDA/taveronen-the-beginning/actions/workflows/tests.yml/badge.svg)](https://github.com/KurchikovDA/taveronen-the-beginning/actions/workflows/tests.yml)
 
-A small tavern game made in Godot 4, released on itch.io in 7 languages, with automated tests (GUT unit and integration tests, a smoke test of the scene changes and a browser test of the web build) and a CI/CD (continuous integration and delivery) pipeline on GitHub Actions.
+A small tavern game made in Godot 4, released on itch.io in 7 languages, with automated tests (GUT unit and integration tests, a smoke test of the scene changes, a browser test of the web build and a start check of the Windows .exe) and a CI/CD (continuous integration and delivery) pipeline on GitHub Actions.
 
 This repository is part of my QA portfolio: it shows a finished game, the automated tests I wrote for it and the pipeline that tests, builds and publishes it.
 
@@ -29,6 +29,7 @@ All tests are in the `test/` folder. Current result of the GUT tests: 19 test sc
 | Integration | `test/integration/` | the real scenes: the New Game confirmation window in the main menu, switching the language in settings, buying an item in the tavern shop (by signal and by a real mouse click), the whole ending (victory screen, "Keep Playing", the gold-milestone easter egg, "Return to Main Menu") together with its music, the music and sound effects volume sliders, and the game version label in the main menu (it must show the version from the project settings) |
 | Smoke test | `test/smoke/` | a script that starts the game without a window, presses the buttons that change the scene (New Game with and without a save, Continue in the intro and in the main menu, Main Menu in the pause menu, Return to Menu on the victory screen, "Yes" in the New Game confirmation) and checks that the right scene opens; it is not a GUT test, it ends with an exit code (0 = all checks passed) |
 | Browser test | `test/e2e/` | a Python test (pytest and Playwright) that opens the exported web build in Chromium, checks that the browser console has no errors, clicks New Game and Continue and checks that the screen really changed by comparing screenshots (e2e = end to end) |
+| Windows build check | `test/ci/` | a PowerShell script that runs the exported Windows `.exe` without a window for a limited number of frames and checks that the game started, loaded the main menu and wrote no errors to its log; it runs only in the release pipeline, on a real Windows server |
 
 What I used and learned while writing them: parameterized tests, doubles, stubs and spies, signal and call assertions, awaiting frames in scene tests, real mouse input with GUT's input sender, stubbing a scene change so a button can be tested, checking audio buses without listening, and cleaning up after each test.
 
@@ -46,7 +47,7 @@ A test that loads a save file with `language_index = 99` failed: the game took t
 2. Make sure the GUT plugin is enabled (Project, Project Settings, Plugins). A GUT panel appears at the bottom of the editor.
 3. In the GUT panel press "Run All". The settings are read from `.gutconfig.json`. If the panel shows no tests, check that the test directory is `res://test` and "Include Subdirs" is turned on.
 
-The GUT tests and the smoke test also run automatically on GitHub on every push (see the badge at the top and the Actions tab). The whole pipeline is described in the CI/CD section below.
+The GUT tests and the smoke test also run automatically on GitHub on every push (see the badge at the top and the Actions tab). The browser test and the Windows build check run in the release pipeline. The whole pipeline is described in the CI/CD section below.
 
 To run the smoke test, start Godot from the command line in the project folder (`godot` means the Godot executable):
 
@@ -77,17 +78,19 @@ Two GitHub Actions workflows live in `.github/workflows/`:
 | Workflow | When it runs | What it does |
 |---|---|---|
 | `tests.yml` (Tests) | on every push to a branch | runs the GUT tests and the smoke test, builds the Allure report (it is published only from `main`) |
-| `release.yml` (Build and release) | when a version tag like `v1.0.7` is pushed, or by hand with the "Run workflow" button | first calls `tests.yml`; then exports the Windows and Web builds with Godot in headless mode, runs the browser test on the web build, saves the builds and the screenshots as downloadable artifacts and uploads both builds to itch.io with butler (the itch.io upload tool) |
+| `release.yml` (Build and release) | when a version tag like `v1.0.7` is pushed, or by hand with the "Run workflow" button | runs four jobs one after another: `test` (calls `tests.yml`), `build` (exports the Windows and Web builds with Godot in headless mode, runs the browser test on the web build, saves the builds and the screenshots as downloadable artifacts), `windows-check` (takes the Windows build on a Windows server and starts the `.exe`, see below) and `publish` (uploads both builds to itch.io with butler, the itch.io upload tool) |
 
-If the tests fail, the build does not start. If the browser test fails, nothing is uploaded.
+If the tests fail, the build does not start. If the browser test or the Windows check fails, nothing is uploaded, because `publish` waits for both `build` and `windows-check`.
+
+The Windows check (`test/ci/check_windows_build.ps1`) runs on a `windows-2025` server. It starts the first `.exe` it finds with `--headless --quit-after 300`, so the game runs without a window for 300 frames, and gives it 60 seconds. The Windows release build has no console, so its output cannot be captured; the script reads the log file that Godot writes itself (`--verbose --log-file`). The check fails if the exit code is not 0, if the log has no line about loading `res://scenes/main_menu.tscn`, or if the log has lines starting with `SCRIPT ERROR`, `USER ERROR`, `ERROR` or `Parse Error`. The harmless message "resources still in use at exit" is ignored. To try it on your own computer, export the Windows build and run in PowerShell: `pwsh ./test/ci/check_windows_build.ps1 -BuildDir <folder with the .exe>`.
 
 Some details:
 
 - The steps that install Godot (and the export templates) are written once, in a reusable action: `.github/actions/setup-godot/action.yml`.
-- The versions of the tools are fixed on purpose, so a new version cannot break the pipeline by itself: Godot in the action file, butler in `release.yml`, the Python packages in `test/e2e/requirements.txt`.
+- The versions of the tools are fixed on purpose, so a new version cannot break the pipeline by itself: Godot in the action file, butler, the runner images (`ubuntu-24.04`, `windows-2025`) and the GitHub Actions in the workflow files, the Python packages in `test/e2e/requirements.txt`.
 - Dependabot (`.github/dependabot.yml`) checks the versions of the GitHub Actions used in the workflows once a month and opens a pull request when a newer one exists. Because the pull request check runs only `tests.yml`, I first run `release.yml` by hand on the bot's branch (with "publish" off) and merge only when it is green.
 - The itch.io key is stored in GitHub Secrets and is never in the repository.
-- A manual run of `release.yml` does a safe dry run for itch.io (butler only lists what it would upload). The "publish" option turns on a real upload, and only the `main` branch or a version tag can use it.
+- A manual run of `release.yml` does a safe dry run for itch.io (butler only lists what it would upload) in the `publish` job. The "publish" option turns on a real upload, and only the `main` branch or a version tag can use it.
 
 ### Protected main branch
 
@@ -98,11 +101,11 @@ The `main` branch is protected by a repository ruleset: nobody can push to it di
 1. Create a branch `release-X.Y.Z` and raise the version in three places: the project settings (Application, Config, Version, which is also shown in the main menu) and the Godot export presets (`file_version` and `product_version`). Commit, push and open a pull request.
 2. Wait for the green `Tests` check, merge the pull request and pull `main`.
 3. Create a tag `vX.Y.Z` with the same number on the top commit of `main` and push it.
-4. The pipeline checks that the tag matches the game version (in the export presets and in the project settings), runs the tests, builds, tests the web build and uploads both builds to the `windows` and `web` channels of the itch.io page. The itch.io page text, tags and the devlog are still updated by hand.
+4. The pipeline checks that the tag matches the game version (in the export presets and in the project settings), runs the tests, builds, tests the web build, starts the Windows `.exe` on a Windows server and only then uploads both builds to the `windows` and `web` channels of the itch.io page. The itch.io page text, tags and the devlog are still updated by hand.
 
 ### Rolling back to a previous version
 
-If a release is broken, run `release.yml` by hand from the tag of the last good version (Actions, Build and release, Run workflow, "Use workflow from" = that tag) with "publish" turned on. The workflow file is taken from the tag, so the old release is rebuilt exactly as it was, and butler sends only the difference to itch.io. Run it first with "publish" off to see what would be uploaded. This works for tags that already contain `release.yml` (`v1.0.5` and newer). To go forward again, run it from the newest tag the same way.
+If a release is broken, run `release.yml` by hand from the tag of the last good version (Actions, Build and release, Run workflow, "Use workflow from" = that tag) with "publish" turned on. The workflow file is taken from the tag, so the old release is rebuilt exactly as it was, and butler sends only the difference to itch.io. Run it first with "publish" off to see what would be uploaded. This works for tags that already contain `release.yml` (`v1.0.5` and newer). Tags older than `v1.0.8` have the older chain without the separate `windows-check` and `publish` jobs, and that is fine: the old release is rebuilt the way it was made. To go forward again, run it from the newest tag the same way.
 
 ## Known limitations
 
@@ -113,6 +116,7 @@ If a release is broken, run `release.yml` by hand from the tag of the last good 
 - The Ukrainian, German, French and Chinese translations are AI-assisted and have not been reviewed by native speakers yet.
 - Gold income is paused while the victory screen or the hidden gold-milestone screen is open. This is a deliberate decision.
 - The browser test covers only the path main menu, New Game, intro, Continue, tavern. It clicks by pixel coordinates for a fixed window size, so a change of the menu layout needs new coordinates. A screen counts as changed when more than 20 percent of the pixels differ.
+- The Windows build check only proves that the `.exe` starts, loads the main menu and writes no errors in 300 frames. It runs without a window, so it does not see the picture, does not press buttons and does not check sound. Playing the Windows build by hand before a big release is still a good idea.
 - The version label test checks the text of the label, not how it looks (position, color and size are checked by eye).
 - Builds are uploaded to itch.io by the pipeline, but the itch.io page itself (description, tags, the "played in browser" option) is edited by hand.
 
